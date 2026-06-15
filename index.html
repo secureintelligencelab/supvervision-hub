@@ -261,7 +261,7 @@ try {
    week to week. Class timetables still go through admin approval for Moodle.
    ============================================================ */
 
-const mem = { users:{}, semesters:{}, students:{}, timetables:{}, consultations:{}, attendance:{}, costLogs:{} };
+const mem = { users:{}, semesters:{}, students:{}, timetables:{}, consultations:{}, attendance:{}, messages:{} };
 let memSeed = false;
 function seedDemo(){
   if(memSeed) return; memSeed=true;
@@ -291,15 +291,21 @@ function seedDemo(){
       2:{held:true,studentAttended:false,coAttended:"na",comment:"Student unwell, rescheduled offline."},
       3:{held:true,studentAttended:true,coAttended:"no",comment:""}
     }};
-  // sample co-supervisor log entries (ad-hoc, not weekly)
-  mem.costLogs["cl1"]={semesterId:"s2-2026",studentDocId:"st1",studentName:"Aisha Khan",
-    coUid:"supC",coName:"Dr Patel",createdByUid:"supA",createdByName:"Dr Smith",
-    date:"2026-03-04",title:"Methodology review",coAttended:"yes",
-    note:"Dr Patel reviewed the sampling strategy and suggested adding a pilot study."};
-  mem.costLogs["cl2"]={semesterId:"s2-2026",studentDocId:"st1",studentName:"Aisha Khan",
-    coUid:"supC",coName:"Dr Patel",createdByUid:"supA",createdByName:"Dr Smith",
-    date:"2026-04-15",title:"Draft chapter feedback",coAttended:"no",
-    note:"Dr Patel unavailable; feedback to be provided by email instead."};
+  // sample messages.
+  // Recipient is either staff (toType 'staff', toUid) or a student (toType
+  // 'student', toSid). Students are read-only and cannot send.
+  mem.messages["m1"]={fromUid:"supA",fromName:"Dr Smith",fromRole:"supervisor",
+    toType:"staff",toUid:"supC",toName:"Dr Patel",
+    body:"Could you join Aisha's week 5 consultation? We'll be reviewing her methodology.",
+    ts:Date.parse("2026-03-01T09:15:00"),readBy:{}};
+  mem.messages["m2"]={fromUid:"supC",fromName:"Dr Patel",fromRole:"supervisor",
+    toType:"staff",toUid:"supA",toName:"Dr Smith",
+    body:"Yes, I can make week 5. I'll prepare comments on her sampling plan beforehand.",
+    ts:Date.parse("2026-03-01T11:40:00"),readBy:{}};
+  mem.messages["m3"]={fromUid:"supA",fromName:"Dr Smith",fromRole:"supervisor",
+    toType:"student",toSid:"45001",toName:"Aisha Khan",
+    body:"Great progress this week. Please send your updated chapter draft before our next meeting.",
+    ts:Date.parse("2026-03-02T14:05:00"),readBy:{}};
 }
 
 const DB = {
@@ -562,10 +568,10 @@ function renderApp(){
   );
   const TABS = S.role==="admin"
     ? [["students","Students"],["timetables","Class timetables"],["consultations","Consultations"],
-       ["meetinglog","Supervision diary"],["costlog","Co-supervisor log"],["report","Summary report"],
+       ["meetinglog","Supervision diary"],["messages","Messages"],["report","Summary report"],
        ["export","Moodle export"],["people","Semesters & staff"]]
     : [["students","My students"],["timetables","My class time"],["consultations","Consultation times"],
-       ["meetinglog","Supervision diary"],["costlog","Co-supervisor log"]];
+       ["meetinglog","Supervision diary"],["messages","Messages"]];
   const tabs=el("nav",{class:"tabs ui"});
   TABS.forEach(([id,label])=>{
     tabs.append(el("button",{class:S.tab===id?"active":"",onclick:()=>{S.tab=id;drawMain();}},label));
@@ -593,7 +599,7 @@ async function drawMain(){
   if(S.tab==="timetables") return viewTimetables(v);
   if(S.tab==="consultations") return viewConsultations(v);
   if(S.tab==="meetinglog") return viewMeetingLog(v);
-  if(S.tab==="costlog") return viewCoSupLog(v);
+  if(S.tab==="messages") return viewMessages(v);
   if(S.tab==="report") return viewReport(v);
   if(S.tab==="export") return viewExport(v);
   if(S.tab==="people") return viewPeople(v);
@@ -1237,137 +1243,134 @@ function weekOverrideForm(c,w,done){
 }
 
 
+
 /* ============================================================
-   9b. CO-SUPERVISOR LOG  (principal & admin)
-   Ad-hoc record of co-supervisor involvement per student. Unlike
-   the weekly Supervision diary, entries are created on demand —
-   add as many or as few sessions as needed, each with its own date,
-   title, whether the co-supervisor attended, and a note.
+   9b. MESSAGES  (staff send; students read-only)
+   Direct 1-to-1 messages. A staff member (admin, principal or
+   co-supervisor) composes to one recipient — any staff member or
+   any student. Students never send; they only read messages
+   addressed to them (shown in their read-only lookup view).
+   Message shape:
+     {fromUid, fromName, fromRole,
+      toType:'staff'|'student',
+      toUid (if staff) | toSid (if student),
+      toName, body, ts, readBy:{uid:true}}
    ============================================================ */
-async function viewCoSupLog(v){
+async function viewMessages(v){
   v.innerHTML="";
   v.append(el("div",{class:"section-title"},el("div",{},
-    el("div",{class:"eyebrow ui"},"Co-supervisor involvement"),
-    el("h2",{},"Co-supervisor log"))));
-  const bar=el("div",{class:"toolbar"}); bar.append(semesterPicker(()=>viewCoSupLog(v)));
-  v.append(bar);
-  v.append(el("p",{class:"muted ui",style:"margin-top:-6px"},
-    "A flexible record of when the co-supervisor was involved with a student. Add an entry for each session, review, or meeting — there's no fixed weekly schedule. Principals log for their own students; admins can log for anyone."));
+    el("div",{class:"eyebrow ui"},"Direct messages"),
+    el("h2",{},"Messages"))));
+  v.append(el("p",{class:"muted ui",style:"margin-top:-8px"},
+    "Send a direct message to any staff member or student. Students can read messages sent to them but cannot reply."));
 
-  // students this user may log against
-  let students=await DB.list("students", S.activeSem?{semesterId:S.activeSem}:{});
-  if(S.role==="supervisor") students=students.filter(s=>s.principalUid===S.uid);
-  // only students that actually have a co-supervisor are loggable
-  const withCo=students.filter(s=>s.coUid);
-  if(!withCo.length){
-    v.append(emptyState("No students with a co-supervisor",
-      S.role==="supervisor"
-        ? "None of your students have a co-supervisor assigned this semester."
-        : "Assign a co-supervisor to a student first (Students tab)."));
+  // sub-tabs: Inbox / Sent
+  let sub = viewMessages._sub || "inbox";
+  const subBar=el("div",{class:"seg",style:"max-width:280px;margin:0 0 16px"});
+  const mkSub=(id,label)=>el("button",{class:sub===id?"active":"",onclick:()=>{viewMessages._sub=id;viewMessages(v);}},label);
+  subBar.append(mkSub("inbox","Inbox"),mkSub("sent","Sent"));
+  v.append(el("div",{class:"row",style:"justify-content:space-between;align-items:center"},
+    subBar,
+    el("button",{class:"btn",onclick:()=>composeMessage(()=>viewMessages(v))},"✎ New message")));
+
+  const all=await DB.list("messages");
+  let rows;
+  if(sub==="inbox"){
+    rows=all.filter(m=>m.toType==="staff" && m.toUid===S.uid);
+  } else {
+    rows=all.filter(m=>m.fromUid===S.uid);
+  }
+  rows.sort((a,b)=>(b.ts||0)-(a.ts||0)); // newest first
+
+  if(!rows.length){
+    v.append(emptyState(sub==="inbox"?"No messages yet":"You haven't sent anything",
+      sub==="inbox"?"Messages sent to you will appear here.":"Use New message to write to a colleague or student."));
     return;
   }
 
-  // student picker
-  const sel=el("select",{style:"width:auto;min-width:240px"});
-  withCo.forEach(s=>sel.append(el("option",{value:s.id},s.name+" · co: "+(s.coName||"—"))));
-  v.append(el("div",{class:"toolbar"},el("div",{class:"field"},el("label",{},"Student"),sel)));
-
-  const panel=el("div",{});
-  v.append(panel);
-
-  async function renderFor(studentId){
-    panel.innerHTML="";
-    const s=withCo.find(x=>x.id===studentId);
-    let logs=(await DB.list("costLogs", S.activeSem?{semesterId:S.activeSem}:{}))
-      .filter(l=>l.studentDocId===studentId);
-    logs.sort((a,b)=>(a.date<b.date?1:-1)); // newest first
-
-    // summary
-    const total=logs.length;
-    const present=logs.filter(l=>l.coAttended==="yes").length;
-    const absent=logs.filter(l=>l.coAttended==="no").length;
-    panel.append(el("div",{class:"stat"},
-      statBox(String(total),"Log entries"),
-      statBox(String(present),"Co-supervisor present"),
-      statBox(String(absent),"Co-supervisor absent")));
-
-    // add button
-    panel.append(el("div",{class:"row",style:"margin-bottom:12px"},
-      el("button",{class:"btn",onclick:()=>coSupForm(s,null,()=>renderFor(studentId))},"+ Add log entry")));
-
-    if(!logs.length){
-      panel.append(emptyState("No entries yet for "+s.name,
-        "Add an entry whenever the co-supervisor ("+(s.coName||"—")+") meets the student or contributes to supervision."));
-      return;
-    }
-
-    const card=el("div",{class:"card",style:"padding:0;overflow:hidden"});
-    const t=el("table",{});
-    t.append(el("thead",{},el("tr",{},...["Date","Title","Co-supervisor","Attended","Note","Logged by",""].map(h=>el("th",{},h)))));
-    const tb=el("tbody",{});
-    logs.forEach(l=>{
-      const att = l.coAttended==="yes" ? el("span",{class:"pill held"},"Attended")
-                : l.coAttended==="no"  ? el("span",{class:"pill missed"},"Absent")
-                : el("span",{class:"pill none"},"N/A");
-      const actions=el("div",{class:"row"});
-      // principal who owns the student, or admin, can edit/delete
-      const canEdit = S.role==="admin" || (S.role==="supervisor" && s.principalUid===S.uid);
-      if(canEdit){
-        actions.append(el("button",{class:"btn ghost sm",onclick:()=>coSupForm(s,l,()=>renderFor(studentId))},"Edit"),
-          el("button",{class:"btn danger sm",onclick:()=>confirmDelete("costLogs",l.id,"this log entry",()=>renderFor(studentId))},"Delete"));
+  // mark inbox messages as read
+  if(sub==="inbox"){
+    for(const m of rows){
+      if(!m.readBy || !m.readBy[S.uid]){
+        const readBy={...(m.readBy||{}),[S.uid]:true};
+        DB.update("messages",m.id,{readBy}); // fire-and-forget
+        m.readBy=readBy;
       }
-      tb.append(el("tr",{},
-        el("td",{},el("strong",{},fmtDate(l.date))),
-        el("td",{},l.title||"—"),
-        el("td",{},l.coName||"—"),
-        el("td",{},att),
-        el("td",{class:"muted",style:"max-width:280px;white-space:normal"},l.note||"—"),
-        el("td",{class:"muted"},l.createdByName||"—"),
-        el("td",{},actions)));
-    });
-    t.append(tb); card.append(t); panel.append(card);
+    }
   }
 
-  sel.onchange=()=>renderFor(sel.value);
-  renderFor(sel.value);
+  const list=el("div",{class:"grid",style:"gap:10px"});
+  rows.forEach(m=>{
+    const who = sub==="inbox"
+      ? "From "+(m.fromName||"—")
+      : "To "+(m.toName||"—")+(m.toType==="student"?" (student)":"");
+    const unread = sub==="inbox" && false; // already marked read above
+    const card=el("div",{class:"card",style:"padding:14px 16px"});
+    card.append(
+      el("div",{class:"row",style:"justify-content:space-between;align-items:baseline;margin-bottom:6px"},
+        el("strong",{class:"ui",style:"font-size:15px"},who),
+        el("span",{class:"muted ui",style:"font-size:12.5px"},fmtTs(m.ts))),
+      el("div",{style:"white-space:pre-wrap"},m.body||""));
+    // sender (or admin) can delete their own message
+    if(m.fromUid===S.uid || S.role==="admin"){
+      card.append(el("div",{class:"row",style:"justify-content:flex-end;margin-top:8px"},
+        el("button",{class:"btn ghost sm",onclick:()=>confirmDelete("messages",m.id,"this message",()=>viewMessages(v))},"Delete")));
+    }
+    list.append(card);
+  });
+  v.append(list);
 }
 
-function fmtDate(d){
-  if(!d) return "—";
-  const dt=new Date(d+"T00:00:00");
-  if(isNaN(dt)) return d;
-  return dt.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});
+function fmtTs(ts){
+  if(!ts) return "";
+  const d=new Date(ts);
+  if(isNaN(d)) return "";
+  return d.toLocaleString(undefined,{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
 }
 
-function coSupForm(student,existing,done){
-  const today=new Date().toISOString().slice(0,10);
-  const date=el("input",{type:"date",value:existing?.date||today});
-  const title=el("input",{value:existing?.title||"",placeholder:"e.g. Methodology review, draft feedback"});
-  const att=el("select",{},
-    el("option",{value:"yes",...(existing?.coAttended==="yes"?{selected:"selected"}:{})},"Co-supervisor attended"),
-    el("option",{value:"no",...(existing?.coAttended==="no"?{selected:"selected"}:{})},"Co-supervisor absent"),
-    el("option",{value:"na",...(existing?.coAttended==="na"?{selected:"selected"}:{})},"Not applicable"));
-  const note=el("textarea",{placeholder:"What was discussed or contributed?"},existing?.note||"");
-  modal((existing?"Edit":"Add")+" co-supervisor log — "+student.name,
+async function composeMessage(done){
+  // Build recipient list: all staff (except me) + all students.
+  const users=(await DB.listUsers()).filter(u=>u.id!==S.uid);
+  const students=await DB.list("students", S.activeSem?{semesterId:S.activeSem}:{});
+
+  const sel=el("select",{});
+  sel.append(el("option",{value:"",disabled:"disabled",selected:"selected"},"Choose a recipient…"));
+  if(users.length){
+    const og=el("optgroup",{label:"Staff"});
+    users.forEach(u=>og.append(el("option",{value:"staff:"+u.id},(u.name||u.email)+" · "+(u.role==="admin"?"Admin":capLabel(capOf(u))))));
+    sel.append(og);
+  }
+  if(students.length){
+    const og=el("optgroup",{label:"Students"});
+    // de-dupe students by sid (a student may recur across semesters)
+    const seen=new Set();
+    students.forEach(s=>{ if(seen.has(s.sid))return; seen.add(s.sid);
+      og.append(el("option",{value:"student:"+s.sid+":"+s.id},s.name+" · "+s.sid)); });
+    sel.append(og);
+  }
+  const body=el("textarea",{placeholder:"Write your message…",style:"min-height:120px"});
+
+  modal("New message",
     el("div",{class:"grid"},
-      el("p",{class:"muted",style:"margin:0"},"Co-supervisor for this student: "+(student.coName||"—")+". No admin approval needed."),
-      el("div",{class:"grid",style:"grid-template-columns:1fr 1fr"},
-        el("div",{},el("label",{},"Date"),date),
-        el("div",{},el("label",{},"Co-supervisor attendance"),att)),
-      el("div",{},el("label",{},"Title / topic"),title),
-      el("div",{},el("label",{},"Note"),note)),
+      el("div",{},el("label",{},"To"),sel),
+      el("div",{},el("label",{},"Message"),body),
+      el("p",{class:"muted",style:"margin:0"},"The recipient will see this in their Messages. Students see it in their schedule view but can't reply.")),
     async()=>{
-      if(!date.value){ toast("Choose a date.",true); return false; }
-      const data={
-        semesterId:student.semesterId||S.activeSem, studentDocId:student.id, studentName:student.name,
-        coUid:student.coUid||"", coName:student.coName||"",
-        createdByUid:S.uid, createdByName:S.userName||"",
-        date:date.value, title:title.value.trim(), coAttended:att.value, note:note.value.trim()
-      };
-      if(existing) await DB.update("costLogs",existing.id,data);
-      else await DB.add("costLogs",data);
-      toast(existing?"Entry updated.":"Entry added."); done(); return true;
-    });
+      if(!sel.value){ toast("Choose a recipient.",true); return false; }
+      if(!body.value.trim()){ toast("Write a message first.",true); return false; }
+      const parts=sel.value.split(":");
+      const data={fromUid:S.uid,fromName:S.userName||S.user.email,fromRole:S.role,
+        body:body.value.trim(),ts:Date.now(),readBy:{}};
+      if(parts[0]==="staff"){
+        const u=users.find(x=>x.id===parts[1]);
+        data.toType="staff"; data.toUid=parts[1]; data.toName=u?.name||u?.email||"";
+      } else {
+        const s=students.find(x=>x.id===parts[2]);
+        data.toType="student"; data.toSid=parts[1]; data.toName=s?.name||"";
+      }
+      await DB.add("messages",data);
+      toast("Message sent."); done(); return true;
+    },"Send");
 }
 
 /* ============================================================
@@ -1790,6 +1793,32 @@ async function renderStudentView(sid,enrolments,sems){
 
     col.append(card);
   }
+
+  // ---- Messages to this student (read-only) ----
+  const msgs=(await DB.list("messages"))
+    .filter(m=>m.toType==="student" && m.toSid===sid)
+    .sort((a,b)=>(b.ts||0)-(a.ts||0));
+  const msgCard=el("div",{class:"card",style:"margin-bottom:14px;border-top:4px solid var(--teal)"});
+  msgCard.append(
+    el("div",{class:"eyebrow ui",style:"color:var(--teal-deep)"},"Messages from your supervisors"),
+    el("h3",{style:"margin:2px 0 10px"},"Messages"));
+  if(!msgs.length){
+    msgCard.append(el("p",{class:"muted",style:"margin:0"},"No messages yet."));
+  } else {
+    const list=el("div",{class:"grid",style:"gap:10px"});
+    msgs.forEach(m=>{
+      list.append(el("div",{style:"border:1px solid var(--line);border-radius:8px;padding:11px 13px;background:var(--paper)"},
+        el("div",{class:"row",style:"justify-content:space-between;align-items:baseline;margin-bottom:5px"},
+          el("strong",{class:"ui",style:"font-size:14px"},"From "+(m.fromName||"your supervisor")),
+          el("span",{class:"muted ui",style:"font-size:12px"},fmtTs(m.ts))),
+        el("div",{style:"white-space:pre-wrap"},m.body||"")));
+    });
+    msgCard.append(list);
+    msgCard.append(el("p",{class:"muted ui",style:"margin:10px 0 0;font-size:12.5px"},
+      "This is a read-only view. To reply, contact your supervisor directly."));
+  }
+  col.append(msgCard);
+
   wrap.append(col);
   document.body.append(wrap, toastNode());
 }
