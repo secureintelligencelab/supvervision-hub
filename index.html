@@ -8,24 +8,25 @@
   /* ============================================================
      DESIGN TOKENS
      Palette: "Field notebook" — ink, paper, supervisory teal,
-     approval amber, alert clay. Grounded in research/academic
-     world: ruled-paper structure, ink-on-cream, archival feel.
+     approval amber, alert clay. Ruled-paper structure, ink-on-cream.
      ============================================================ */
   :root{
-    --ink:#1c2024;
-    --ink-soft:#434b52;
+    --ink:#14181c;
+    --ink-soft:#39424a;
     --paper:#f6f3ec;
     --paper-2:#fffdf8;
-    --line:#d9d3c6;
-    --line-strong:#bcb4a2;
-    --teal:#1f6f6b;          /* primary action / supervisor */
-    --teal-deep:#13504d;
-    --amber:#c98a14;         /* pending / approval */
+    --line:#d4cdbe;
+    --line-strong:#b0a896;
+    --teal:#1a5f5b;
+    --teal-deep:#0e423f;
+    --amber:#b97c0c;
     --amber-soft:#f3e3bf;
-    --clay:#b5482f;          /* delete / alert */
-    --green:#3f7d4e;         /* approved / present */
-    --green-soft:#dceadc;
-    --blue:#3a5e91;          /* student tone */
+    --clay:#a8401f;
+    --clay-soft:#f1d9d2;
+    --green:#367044;
+    --green-soft:#d2e6d3;
+    --blue:#33548a;
+    --blue-soft:#d6e1f1;
     --shadow:0 1px 0 var(--line-strong),0 6px 24px -12px rgba(28,32,36,.4);
     --r:10px;
   }
@@ -34,23 +35,24 @@
   body{
     margin:0;background:var(--paper);color:var(--ink);
     font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
-    line-height:1.5;font-size:15px;
+    line-height:1.55;font-size:16.5px;
   }
   body, input, select, button, textarea{font-family:inherit}
   .ui{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
   h1,h2,h3{font-weight:600;letter-spacing:-.01em;line-height:1.15;margin:0}
   a{color:var(--teal-deep)}
-  button{cursor:pointer;font-size:14px}
+  button{cursor:pointer;font-size:15px}
   input,select,textarea{
-    font-size:14px;padding:9px 11px;border:1px solid var(--line-strong);
+    font-size:15.5px;padding:10px 12px;border:1px solid var(--line-strong);
     border-radius:8px;background:var(--paper-2);color:var(--ink);width:100%;
   }
+  textarea{resize:vertical;min-height:62px;line-height:1.45}
   input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);outline-offset:1px;border-color:var(--teal)}
-  label{font-size:12.5px;font-weight:600;color:var(--ink-soft);display:block;margin:0 0 4px;
+  label{font-size:13.5px;font-weight:700;color:var(--ink-soft);display:block;margin:0 0 5px;
     font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;text-transform:uppercase;letter-spacing:.04em}
   .btn{
     display:inline-flex;align-items:center;gap:7px;border:1px solid var(--teal-deep);
-    background:var(--teal);color:#fff;padding:9px 15px;border-radius:8px;font-weight:600;
+    background:var(--teal);color:#fff;padding:10px 16px;border-radius:8px;font-weight:600;font-size:15px;
     font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
     transition:filter .12s;width:auto;
   }
@@ -58,49 +60,53 @@
   .btn:active{filter:brightness(.95)}
   .btn.ghost{background:transparent;color:var(--teal-deep);border-color:var(--line-strong)}
   .btn.ghost:hover{background:#0000000a;filter:none}
-  .btn.danger{background:var(--clay);border-color:#8f3823}
-  .btn.amber{background:var(--amber);border-color:#9a6b0f}
-  .btn.sm{padding:5px 10px;font-size:12.5px;border-radius:6px}
+  .btn.danger{background:var(--clay);border-color:#7e3017}
+  .btn.amber{background:var(--amber);border-color:#8a5b0a}
+  .btn.blue{background:var(--blue);border-color:#264068;color:#fff}
+  .btn.sm{padding:6px 12px;font-size:13.5px;border-radius:6px}
+  .btn.xs{padding:4px 10px;font-size:12.5px;border-radius:6px}
   .btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
   .grid{display:grid;gap:12px}
   .card{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
-  .muted{color:var(--ink-soft);font-size:13px}
-  .pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;
-    padding:3px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em;
+  .muted{color:var(--ink-soft);font-size:14.5px}
+  .pill{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;
+    padding:4px 10px;border-radius:99px;text-transform:uppercase;letter-spacing:.04em;
     font-family:ui-sans-serif,system-ui,sans-serif}
   .pill.pending{background:var(--amber-soft);color:#7a5408}
   .pill.approved{background:var(--green-soft);color:#235c30}
   .pill.none{background:#eee9dd;color:#6b6555}
-  table{width:100%;border-collapse:collapse;font-size:13.5px}
-  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
-  th{font-family:ui-sans-serif,system-ui,sans-serif;font-size:11.5px;text-transform:uppercase;
+  .pill.held{background:var(--green-soft);color:#235c30}
+  .pill.missed{background:var(--clay-soft);color:#7e3017}
+  .pill.blue{background:var(--blue-soft);color:#264068}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:ui-sans-serif,system-ui,sans-serif;font-size:12.5px;text-transform:uppercase;
     letter-spacing:.05em;color:var(--ink-soft);font-weight:700}
-  tr:hover td{background:#0000000a}
+  tr:hover td{background:#0000000d}
   .hidden{display:none!important}
 
-  /* ---- Shell ---- */
   header.app{
     background:var(--ink);color:var(--paper);padding:0 22px;
-    display:flex;align-items:center;justify-content:space-between;height:60px;
+    display:flex;align-items:center;justify-content:space-between;height:62px;
     border-bottom:3px solid var(--teal);
   }
   .brand{display:flex;align-items:center;gap:12px}
   .brand .mark{
-    width:34px;height:34px;border-radius:7px;background:var(--teal);
+    width:36px;height:36px;border-radius:7px;background:var(--teal);
     display:grid;place-items:center;font-weight:700;color:#fff;font-family:ui-sans-serif,sans-serif;
     box-shadow:inset 0 0 0 1px #ffffff22;
   }
-  .brand h1{font-size:17px;color:var(--paper)}
-  .brand .sub{font-size:11px;color:#b7b09f;font-family:ui-sans-serif,sans-serif;letter-spacing:.05em;text-transform:uppercase}
-  .who{display:flex;align-items:center;gap:12px;font-family:ui-sans-serif,sans-serif;font-size:13px}
-  .who .role{font-size:11px;color:#b7b09f;text-transform:uppercase;letter-spacing:.05em}
+  .brand h1{font-size:18px;color:var(--paper)}
+  .brand .sub{font-size:11.5px;color:#c4bdac;font-family:ui-sans-serif,sans-serif;letter-spacing:.05em;text-transform:uppercase}
+  .who{display:flex;align-items:center;gap:12px;font-family:ui-sans-serif,sans-serif;font-size:14px}
+  .who .role{font-size:11.5px;color:#c4bdac;text-transform:uppercase;letter-spacing:.05em}
 
   main{max-width:1180px;margin:0 auto;padding:22px}
   nav.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:18px;border-bottom:1px solid var(--line)}
   nav.tabs button{
-    background:none;border:none;padding:11px 14px;font-weight:600;color:var(--ink-soft);
-    font-family:ui-sans-serif,system-ui,sans-serif;font-size:14px;border-bottom:2px solid transparent;margin-bottom:-1px;
+    background:none;border:none;padding:12px 15px;font-weight:600;color:var(--ink-soft);
+    font-family:ui-sans-serif,system-ui,sans-serif;font-size:15px;border-bottom:2px solid transparent;margin-bottom:-1px;
   }
   nav.tabs button.active{color:var(--teal-deep);border-bottom-color:var(--teal)}
   nav.tabs button:hover{color:var(--ink)}
@@ -108,11 +114,10 @@
   .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px}
   .field{min-width:150px}
   .section-title{display:flex;align-items:center;gap:10px;margin:0 0 14px}
-  .section-title h2{font-size:21px}
-  .eyebrow{font-family:ui-sans-serif,sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;
+  .section-title h2{font-size:24px}
+  .eyebrow{font-family:ui-sans-serif,sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;
     text-transform:uppercase;color:var(--teal-deep);margin-bottom:3px}
 
-  /* ---- Login ---- */
   .auth-wrap{min-height:100vh;display:grid;place-items:center;padding:20px;
     background:
       repeating-linear-gradient(transparent,transparent 31px,#0000000a 31px,#0000000a 32px),
@@ -127,22 +132,20 @@
     font-family:ui-sans-serif,sans-serif;color:var(--ink-soft)}
   .seg button.active{background:var(--paper-2);color:var(--teal-deep);box-shadow:var(--shadow)}
 
-  /* ---- Modal ---- */
   .modal-bg{position:fixed;inset:0;background:rgba(28,32,36,.5);display:grid;place-items:center;padding:18px;z-index:50}
-  .modal{background:var(--paper-2);border-radius:14px;max-width:520px;width:100%;padding:24px;
+  .modal{background:var(--paper-2);border-radius:14px;max-width:560px;width:100%;padding:24px;
     box-shadow:0 20px 60px -20px rgba(0,0,0,.5);max-height:90vh;overflow:auto}
+  .modal.wide{max-width:760px}
   .modal h3{font-size:19px;margin-bottom:14px}
 
-  /* ---- Toast ---- */
   #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(120%);
     background:var(--ink);color:var(--paper);padding:11px 18px;border-radius:9px;
     font-family:ui-sans-serif,sans-serif;font-size:14px;z-index:99;transition:transform .25s;box-shadow:var(--shadow);max-width:90vw}
   #toast.show{transform:translateX(-50%) translateY(0)}
   #toast.err{background:var(--clay)}
 
-  /* ---- Attendance grid ---- */
   .att-grid{overflow:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--paper-2)}
-  .att-grid table{font-size:12.5px;min-width:640px}
+  .att-grid table{font-size:14px;min-width:640px}
   .att-grid th, .att-grid td{white-space:nowrap}
   .att-cell{cursor:pointer;text-align:center;width:34px;font-weight:700;user-select:none}
   .att-cell.P{background:var(--green-soft);color:#235c30}
@@ -152,19 +155,41 @@
 
   .empty{text-align:center;padding:48px 20px;color:var(--ink-soft)}
   .empty .big{font-size:30px;margin-bottom:8px;opacity:.5}
-  .stat{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:16px}
-  .stat .b{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--r);padding:12px 16px;min-width:120px}
-  .stat .n{font-size:26px;font-weight:700;font-family:ui-sans-serif,sans-serif}
-  .stat .l{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);font-family:ui-sans-serif,sans-serif}
+  .stat{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+  .stat .b{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--r);padding:14px 18px;min-width:130px}
+  .stat .n{font-size:30px;font-weight:700;font-family:ui-sans-serif,sans-serif;color:var(--ink)}
+  .stat .l{font-size:12.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);font-family:ui-sans-serif,sans-serif;font-weight:600}
 
-  details.help{margin-top:14px;font-size:13px}
+  /* Weekly meeting log */
+  .weeklog{border:1px solid var(--line-strong);border-radius:var(--r);overflow:hidden}
+  .weeklog .wrow{display:grid;grid-template-columns:72px 1fr;border-bottom:1px solid var(--line)}
+  .weeklog .wrow:last-child{border-bottom:none}
+  .weeklog .wk{background:#0000000f;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:12px 4px;font-family:ui-sans-serif,sans-serif;border-right:1px solid var(--line)}
+  .weeklog .wk .num{font-size:22px;font-weight:800;color:var(--ink)}
+  .weeklog .wk .lab{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);font-weight:600}
+  .weeklog .wbody{padding:13px 14px}
+  .weeklog .wmeta{display:flex;gap:9px;flex-wrap:wrap;align-items:center;font-size:14px;font-family:ui-sans-serif,sans-serif;color:var(--ink)}
+  .seg3{display:inline-flex;border:1px solid var(--line-strong);border-radius:7px;overflow:hidden}
+  .seg3 button{border:none;background:var(--paper-2);padding:7px 13px;font-size:13.5px;font-weight:600;
+    font-family:ui-sans-serif,sans-serif;color:var(--ink-soft);border-right:1px solid var(--line)}
+  .seg3 button:last-child{border-right:none}
+  .seg3 button.on.yes{background:var(--green);color:#fff}
+  .seg3 button.on.no{background:var(--clay);color:#fff}
+  .seg3 button.on.na{background:var(--ink-soft);color:#fff}
+  .wcomment{margin-top:10px}
+  .wcomment textarea{min-height:44px;font-size:14.5px}
+  .linkpill{font-family:ui-sans-serif,sans-serif;font-size:13px;display:inline-flex;align-items:center;gap:5px;
+    background:var(--blue-soft);color:#22406a;padding:4px 11px;border-radius:99px;text-decoration:none;font-weight:700}
+
+  details.help{margin-top:14px;font-size:14px}
   details.help summary{cursor:pointer;font-family:ui-sans-serif,sans-serif;color:var(--teal-deep);font-weight:600}
-  code{background:#0000000d;padding:1px 5px;border-radius:4px;font-size:12.5px}
+  code{background:#0000000d;padding:1px 5px;border-radius:4px;font-size:13.5px}
 
   @media (max-width:640px){
     main{padding:14px}
     .who .name{display:none}
-    th,td{padding:7px 6px}
+    th,td{padding:8px 7px}
   }
   @media print{
     header.app,nav.tabs,.toolbar,.btn,#toast{display:none!important}
@@ -172,7 +197,6 @@
     .card{box-shadow:none;border:1px solid #999}
   }
 </style>
-
 <!-- Firebase SDK (modular, via CDN) -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -205,48 +229,39 @@ try {
   auth = getAuth(app);
   db = getFirestore(app);
 } catch(e){
-  DEMO = true;               // run with in-memory mock so the UI is testable
+  DEMO = true;
   console.warn("Firebase not configured — running in DEMO (in-memory) mode.");
 }
 
 /* ============================================================
    2. DATA LAYER
    Firestore structure:
-     users/{uid}          -> {email,name,role:'admin'|'supervisor',
-                              supRole:'both'|'principal'|'co'}  // capability
-     semesters/{id}       -> {label, weeks,
-                              units:[{id,code,name}, ...]}      // 1+ units
-     students/{id}        -> {semesterId, sid, name, email, campus,
-                              unitIds:[...],                    // 1+ units
-                              principalUid, coUid, principalName, coName}
-     timetables/{id}      -> {semesterId, unitId, supervisorUid, day, start,
-                              end, room, status:'pending'|'approved'}
-     consultations/{id}   -> {semesterId, studentDocId, supervisorUid,
-                              supervisorRole:'principal'|'co',
-                              day, start, end, mode, status}
-     attendance/{id}      -> {semesterId, studentDocId, supervisorUid,
-                              weeks:{1:'P',2:'A',...}, notes:{1:'...'}}
+     users/{uid}      -> {email,name,role:'admin'|'supervisor',
+                          supRole:'both'|'principal'|'co'}
+     semesters/{id}   -> {label, weeks, units:[{id,code,name}, ...]}
+     students/{id}    -> {semesterId, sid, name, email, campus, unitIds:[...],
+                          principalUid, coUid, principalName, coName}
+     timetables/{id}  -> {semesterId, unitId, supervisorUid, day, start, end,
+                          room, status:'pending'|'approved'}   // class still admin-approved
+     consultations/{id} -> {                                   // ONE per student per principal
+                          semesterId, studentDocId, supervisorUid (principal),
+                          coUid, coName, principalName,
+                          day, start, end, mode, meetingLink,   // recurring default (no approval)
+                          weeks:{                               // per-week LOG
+                            <w>:{ day?,start?,end?,mode?,link?, // optional overrides
+                                  held:bool, studentAttended:bool|null,
+                                  coAttended:'yes'|'no'|'na'|null,
+                                  comment:string }
+                          }
+                        }
+     (attendance collection retained for back-compat reads only; new logging
+      lives inside consultations.weeks so meetings + attendance are one record.)
 
-   NOTE on supervisor capability (supRole):
-     • A "supervisor" login is given a capability of 'both', 'principal'
-       (principal only) or 'co' (co-supervisor only).
-     • The capability controls which dropdowns the supervisor can be
-       assigned in on a student record (principal box, co box, or both).
-     • Principals run the weekly class, mark attendance AND may set a
-       consultation time.
-     • Co-supervisors do NOT run a class, but MAY set their own
-       consultation / meeting time for students they co-supervise.
-     • Each consultation row is keyed by supervisorUid, so a student can
-       have one consultation from the principal and one from the co.
-
-   NOTE on units:
-     • A semester holds one OR MORE units, each {id, code, name}.
-     • A student may be enrolled in several units (unitIds).
-     • Each weekly class time is tied to a specific unit (unitId).
+   Consultation times need NO admin approval — supervisors set & change them
+   week to week. Class timetables still go through admin approval for Moodle.
    ============================================================ */
 
-// ---- DEMO in-memory store (only used if Firebase not configured) ----
-const mem = { users:{}, semesters:{}, students:{}, timetables:{}, consultations:{}, attendance:{} };
+const mem = { users:{}, semesters:{}, students:{}, timetables:{}, consultations:{}, attendance:{}, costLogs:{} };
 let memSeed = false;
 function seedDemo(){
   if(memSeed) return; memSeed=true;
@@ -266,15 +281,35 @@ function seedDemo(){
   mk("st2",{semesterId:"s2-2026",sid:"45002",name:"Tom Reilly",email:"tom@stu.edu",campus:"NSW",unitIds:["u1"],principalUid:"supA",coUid:"",principalName:"Dr Smith",coName:""});
   mk("st3",{semesterId:"s2-2026",sid:"45003",name:"Mei Lin",email:"mei@stu.edu",campus:"ACT",unitIds:["u2"],principalUid:"supB",coUid:"supC",principalName:"Dr Jones",coName:"Dr Patel"});
   mem.timetables["tt1"]={semesterId:"s2-2026",unitId:"u1",supervisorUid:"supA",day:"Tuesday",start:"10:00",end:"13:00",room:"NSW Rm 4.12",status:"approved"};
+  // sample consultation with a couple of weeks logged
+  mem.consultations["c1"]={semesterId:"s2-2026",studentDocId:"st1",supervisorUid:"supA",
+    coUid:"supC",coName:"Dr Patel",principalName:"Dr Smith",
+    day:"Wednesday",start:"14:00",end:"14:30",mode:"Online",
+    meetingLink:"https://teams.microsoft.com/l/meetup/aisha-weekly",
+    weeks:{
+      1:{held:true,studentAttended:true,coAttended:"yes",comment:"Discussed proposal scope."},
+      2:{held:true,studentAttended:false,coAttended:"na",comment:"Student unwell, rescheduled offline."},
+      3:{held:true,studentAttended:true,coAttended:"no",comment:""}
+    }};
+  // sample co-supervisor log entries (ad-hoc, not weekly)
+  mem.costLogs["cl1"]={semesterId:"s2-2026",studentDocId:"st1",studentName:"Aisha Khan",
+    coUid:"supC",coName:"Dr Patel",createdByUid:"supA",createdByName:"Dr Smith",
+    date:"2026-03-04",title:"Methodology review",coAttended:"yes",
+    note:"Dr Patel reviewed the sampling strategy and suggested adding a pilot study."};
+  mem.costLogs["cl2"]={semesterId:"s2-2026",studentDocId:"st1",studentName:"Aisha Khan",
+    coUid:"supC",coName:"Dr Patel",createdByUid:"supA",createdByName:"Dr Smith",
+    date:"2026-04-15",title:"Draft chapter feedback",coAttended:"no",
+    note:"Dr Patel unavailable; feedback to be provided by email instead."};
 }
 
-// Generic CRUD that targets Firestore OR the mock
 const DB = {
   async getUser(uid){
     if(DEMO){ return mem.users[uid]||null; }
     const s = await getDoc(doc(db,"users",uid)); return s.exists()?s.data():null;
   },
   async setUser(uid,data){ if(DEMO){mem.users[uid]={...mem.users[uid],...data};return;} await setDoc(doc(db,"users",uid),data,{merge:true}); },
+  async updateUser(uid,data){ if(DEMO){mem.users[uid]={...mem.users[uid],...data};return;} await updateDoc(doc(db,"users",uid),data); },
+  async removeUser(uid){ if(DEMO){ delete mem.users[uid]; return; } await deleteDoc(doc(db,"users",uid)); },
   async findUserByEmail(email){
     if(DEMO){ const e=Object.entries(mem.users).find(([k,v])=>v.email===email); return e?{uid:e[0],...e[1]}:null; }
     const q=query(collection(db,"users"),where("email","==",email)); const r=await getDocs(q);
@@ -293,6 +328,10 @@ const DB = {
     if(fs.length){ qref=query(qref,...fs.map(([k,v])=>where(k,"==",v))); }
     const r=await getDocs(qref); return r.docs.map(d=>({id:d.id,...d.data()}));
   },
+  async get(coll,id){
+    if(DEMO){ return mem[coll][id]?{id,...mem[coll][id]}:null; }
+    const s=await getDoc(doc(db,coll,id)); return s.exists()?{id,...s.data()}:null;
+  },
   async add(coll,data){
     if(DEMO){ const id="x"+Math.random().toString(36).slice(2,9); mem[coll][id]={...data}; return id; }
     const r=await addDoc(collection(db,coll),data); return r.id;
@@ -304,6 +343,27 @@ const DB = {
   async update(coll,id,data){
     if(DEMO){ mem[coll][id]={...mem[coll][id],...data}; return; }
     await updateDoc(doc(db,coll,id),data);
+  },
+  // Update ONE week inside a consultation's `weeks` map using Firestore's
+  // nested field-path syntax. This rewrites only that single key (never the
+  // whole map), which avoids stale-merge / cache issues that made per-week
+  // time changes appear not to save. weekData fully replaces that week.
+  async updateWeek(consId, weekKey, weekData){
+    const key=String(weekKey);
+    if(DEMO){
+      const c=mem.consultations[consId]||{};
+      const weeks={...(c.weeks||{})};
+      weeks[key]=weekData;
+      mem.consultations[consId]={...c, weeks};
+      return;
+    }
+    await updateDoc(doc(db,"consultations",consId), { ["weeks."+key]: weekData });
+  },
+  // Read a single consultation fresh from the server (bypasses list caching).
+  async getConsultation(id){
+    if(DEMO){ return mem.consultations[id]?{id,...mem.consultations[id]}:null; }
+    const s=await getDoc(doc(db,"consultations",id));
+    return s.exists()?{id,...s.data()}:null;
   },
   async remove(coll,id){ if(DEMO){ delete mem[coll][id]; return; } await deleteDoc(doc(db,coll,id)); }
 };
@@ -328,7 +388,6 @@ function toast(msg,isErr){ const t=$("#toast"); t.textContent=msg; t.className="
 const CAMPUSES=["NSW","ACT","Perth","VIC","QLD"];
 const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
-// ---- Unit helpers (a semester now holds one or more units) ----
 function activeSemester(){ return S.semesters.find(s=>s.id===S.activeSem)||null; }
 function semOf(id){ return S.semesters.find(s=>s.id===id)||null; }
 function unitsOf(sem){ return Array.isArray(sem?.units)?sem.units:[]; }
@@ -339,26 +398,52 @@ function unitOneLine(u){
   if(code&&name) return code+" · "+name;
   return code||name||"Unit";
 }
-// Short summary of all units in a semester, e.g. "RES915, RES920"
 function semUnitCodes(sem){
   const codes=unitsOf(sem).map(u=>(u.code||"").trim()).filter(Boolean);
   return codes.length?codes.join(", "):"No units";
 }
 function uid(){ return "u"+Math.random().toString(36).slice(2,9); }
 
-// ---- Supervisor capability helpers ----
-// supRole: 'both' (default) | 'principal' | 'co'
 function capOf(u){ return u?.supRole||"both"; }
 function canBePrincipal(u){ return capOf(u)!=="co"; }
 function canBeCo(u){ return capOf(u)!=="principal"; }
 function capLabel(c){ return c==="principal"?"Principal only":c==="co"?"Co-supervisor only":"Principal & co"; }
+function supName(uid){ const u=S.supervisors.find(x=>x.id===uid); return u?.name||u?.email||uid||"—"; }
+
+// ---- Consultation / weekly-log helpers ----
+// The effective time for a given week = week override (if any) else the recurring default.
+function weekTime(cons,w){
+  const ov=(cons?.weeks?.[w]) || (cons?.weeks?.[String(w)]) || {};
+  return {
+    day:   ov.day   || cons.day,
+    start: ov.start || cons.start,
+    end:   ov.end   || cons.end,
+    mode:  ov.mode  || cons.mode,
+    link:  ov.link  || cons.meetingLink,
+    overridden: !!(ov.day||ov.start||ov.end||ov.mode||ov.link)
+  };
+}
+function weekLog(cons,w){ return (cons?.weeks?.[w]) || (cons?.weeks?.[String(w)]) || {}; }
+// counts across a consultation's weeks
+function consultStats(cons,totalWeeks){
+  let held=0, attended=0, missed=0, logged=0;
+  for(let w=1;w<=totalWeeks;w++){
+    const l=weekLog(cons,w); if(!Object.keys(l).length) continue;
+    if(l.held===true||l.held===false) logged++;
+    if(l.held===true){ held++;
+      if(l.studentAttended===true) attended++;
+      else if(l.studentAttended===false) missed++;
+    }
+  }
+  return {held,attended,missed,logged};
+}
 
 /* ============================================================
    4. AUTH FLOW
    ============================================================ */
 function renderLogin(){
   document.body.innerHTML="";
-  let mode="supervisor"; // 'supervisor' (login) | 'student' (id lookup)
+  let mode="supervisor";
   const wrap=el("div",{class:"auth-wrap"});
   const card=el("div",{class:"auth-card ui"});
   function draw(){
@@ -367,7 +452,7 @@ function renderLogin(){
       el("div",{class:"mark-lg"},"SH"),
       el("div",{class:"eyebrow"},"Research supervision coordination"),
       el("h1",{style:"font-size:23px;margin:2px 0 4px;font-family:Georgia,serif"},"MRes Supervision Hub"),
-      el("p",{class:"muted"},"Sign in to manage students, timetables and consultations.")
+      el("p",{class:"muted"},"Sign in to manage students, timetables and meetings.")
     );
     const seg=el("div",{class:"seg"},
       el("button",{class:mode==="supervisor"?"active":"",onclick:()=>{mode="supervisor";draw();}},"Staff login"),
@@ -428,24 +513,30 @@ async function doLogin(email,password){
     await afterLogin(); return;
   }
   await signInWithEmailAndPassword(auth,email,password);
-  // onAuthStateChanged handles the rest
 }
 
 async function afterLogin(){
   S.semesters=await DB.list("semesters");
   S.semesters.sort((a,b)=>(a.label>b.label?-1:1));
-  S.activeSem=S.semesters[0]?.id||null;
+  // default to the semester that actually has students (fall back to first)
+  let defaultSem=S.semesters[0]?.id||null;
+  try{
+    const counts={};
+    const all=await DB.list("students");
+    all.forEach(s=>{ counts[s.semesterId]=(counts[s.semesterId]||0)+1; });
+    const best=S.semesters.filter(s=>counts[s.id]).sort((a,b)=>counts[b.id]-counts[a.id])[0];
+    if(best) defaultSem=best.id;
+  }catch(e){}
+  S.activeSem=defaultSem;
   S.supervisors=(await DB.listUsers()).filter(u=>u.role==="supervisor");
   renderApp();
 }
 
-/* ---- STUDENT read-only lookup (no auth) ---- */
 async function studentLookup(sid){
   if(!sid){ toast("Enter your student ID.",true); return; }
   if(DEMO) seedDemo();
   const matches=await DB.list("students",{sid});
   if(!matches.length){ toast("No student found with that ID.",true); return; }
-  // Load context for each enrolment (semester + supervisor schedules)
   const sems=await DB.list("semesters");
   document.body.innerHTML="";
   renderStudentView(sid,matches,sems);
@@ -469,17 +560,21 @@ function renderApp(){
         el("div",{class:"role"},S.role)),
       el("button",{class:"btn ghost sm",onclick:logout},"Sign out"))
   );
-  const tabs=el("nav",{class:"tabs ui"});
   const TABS = S.role==="admin"
-    ? [["students","Students"],["timetables","Class timetables"],["consultations","Consultations"],["attendance","Attendance"],["export","Moodle export"],["people","Semesters & staff"]]
-    : [["students","My students"],["timetables","My class time"],["consultations","Consultations"],["attendance","Attendance"]];
+    ? [["students","Students"],["timetables","Class timetables"],["consultations","Consultations"],
+       ["meetinglog","Supervision diary"],["costlog","Co-supervisor log"],["report","Summary report"],
+       ["export","Moodle export"],["people","Semesters & staff"]]
+    : [["students","My students"],["timetables","My class time"],["consultations","Consultation times"],
+       ["meetinglog","Supervision diary"],["costlog","Co-supervisor log"]];
+  const tabs=el("nav",{class:"tabs ui"});
   TABS.forEach(([id,label])=>{
     tabs.append(el("button",{class:S.tab===id?"active":"",onclick:()=>{S.tab=id;drawMain();}},label));
   });
   const main=el("main",{},el("div",{id:"view"}));
-  document.body.append(header,el("div",{},tabs),main,toastNode());
-  // move tabs inside main container width
+  document.body.append(header,el("div",{},main),toastNode());
   main.prepend(tabs);
+  // guard: if current tab not in this role's set, default to first
+  if(!TABS.some(t=>t[0]===S.tab)) S.tab=TABS[0][0];
   drawMain();
 }
 function logout(){ if(DEMO){ S.user=null; renderLogin(); return; } signOut(auth); }
@@ -497,7 +592,9 @@ async function drawMain(){
   if(S.tab==="students") return viewStudents(v);
   if(S.tab==="timetables") return viewTimetables(v);
   if(S.tab==="consultations") return viewConsultations(v);
-  if(S.tab==="attendance") return viewAttendance(v);
+  if(S.tab==="meetinglog") return viewMeetingLog(v);
+  if(S.tab==="costlog") return viewCoSupLog(v);
+  if(S.tab==="report") return viewReport(v);
   if(S.tab==="export") return viewExport(v);
   if(S.tab==="people") return viewPeople(v);
 }
@@ -539,7 +636,6 @@ async function viewStudents(v){
       (!cf||s.campus===cf) &&
       [s.name,s.sid,s.email].some(x=>(x||"").toLowerCase().includes(term)));
     if(!filtered.length){ body.append(emptyState("No students here yet","Add one or upload a CSV to begin.")); return; }
-    // group by campus
     const byCampus={};
     filtered.forEach(s=>{ (byCampus[s.campus||"Unassigned"] ||= []).push(s); });
     Object.keys(byCampus).sort().forEach(campus=>{
@@ -587,7 +683,6 @@ function studentForm(existing,done){
     campus:existing?.campus||CAMPUSES[0], principalUid:existing?.principalUid||"", coUid:existing?.coUid||"",
     unitIds:existing?.unitIds||[]
   };
-  // Capability-filtered options: principal box lists those who can be principal; co box lists those who can be co.
   const supOpts=(pool,sel)=>[el("option",{value:""},"— none —"),
     ...pool.map(u=>el("option",{value:u.id,...(u.id===sel?{selected:"selected"}:{})},
       (u.name||u.email)+(capOf(u)!=="both"?" ("+capLabel(capOf(u)).toLowerCase()+")":"")))];
@@ -596,7 +691,6 @@ function studentForm(existing,done){
   const prin=el("select",{},...supOpts(S.supervisors.filter(canBePrincipal),f.principalUid));
   const co=el("select",{},...supOpts(S.supervisors.filter(canBeCo),f.coUid));
 
-  // Unit checkboxes for the active semester
   const units=unitsOf(sem);
   const unitBoxes=units.map(u=>{
     const cb=el("input",{type:"checkbox",style:"width:auto",...(f.unitIds.includes(u.id)?{checked:"checked"}:{})});
@@ -627,6 +721,11 @@ function studentForm(existing,done){
       const data={semesterId:S.activeSem,sid:sid.value.trim(),name:name.value.trim(),email:email.value.trim(),
         campus:campus.value,unitIds,principalUid:prin.value,coUid:co.value,principalName:pName,coName:cName};
       if(existing) await DB.update("students",existing.id,data); else await DB.add("students",data);
+      // keep linked consultation's denormalised supervisor names in sync
+      if(existing){
+        const cons=await DB.list("consultations",{studentDocId:existing.id});
+        for(const c of cons){ await DB.update("consultations",c.id,{coUid:co.value,coName:cName,principalName:pName}); }
+      }
       toast("Saved."); done(); return true;
     });
 }
@@ -651,7 +750,7 @@ function importCSV(done){
   const sem=activeSemester();
   modal("Upload students from CSV",
     el("div",{},
-      el("p",{class:"muted",style:"margin-top:0"},"First row must be a header. Supervisors are matched by email and must have the right capability (a co-only supervisor won't be set as principal). The optional “units” column lists unit codes separated by ; or | and must match this semester's units."),
+      el("p",{class:"muted",style:"margin-top:0"},"First row must be a header. Supervisors are matched by email and must have the right capability. The optional \u201Cunits\u201D column lists unit codes separated by ; or | and must match this semester's units."),
       input, preview,
       el("details",{class:"help"},el("summary",{},"Show example CSV"),
         el("pre",{style:"background:#0000000d;padding:10px;border-radius:8px;overflow:auto;font-size:12px"},
@@ -666,7 +765,7 @@ function importCSV(done){
         const pEmail=(row.principal_email||"").trim(), cEmail=(row.co_email||"").trim();
         let p=pEmail?S.supervisors.find(u=>u.email===pEmail):null;
         let c=cEmail?S.supervisors.find(u=>u.email===cEmail):null;
-        if(p&&!canBePrincipal(p)) p=null;   // capability guard
+        if(p&&!canBePrincipal(p)) p=null;
         if(c&&!canBeCo(c)) c=null;
         if(!row.name||!row.sid) continue;
         const codes=(row.units||"").split(/[;|]/).map(x=>x.trim().toLowerCase()).filter(Boolean);
@@ -684,7 +783,7 @@ function importCSV(done){
 function parseCSV(text){
   const lines=text.replace(/\r/g,"").split("\n").filter(l=>l.trim().length);
   if(lines.length<2) return [];
-  const split=l=>{ // basic quoted-CSV split
+  const split=l=>{
     const out=[];let cur="",q=false;
     for(const ch of l){ if(ch==='"'){q=!q;} else if(ch===","&&!q){out.push(cur);cur="";} else cur+=ch; }
     out.push(cur); return out.map(s=>s.trim());
@@ -694,8 +793,7 @@ function parseCSV(text){
 }
 
 /* ============================================================
-   7. CLASS TIMETABLES TAB  (supervisor sets weekly class)
-   Only principals run a class; co-supervisors do not appear here.
+   7. CLASS TIMETABLES TAB  (principal sets weekly class; admin approves)
    ============================================================ */
 async function viewTimetables(v){
   v.innerHTML="";
@@ -705,8 +803,6 @@ async function viewTimetables(v){
     el("h2",{},S.role==="admin"?"Class timetables":"My class time"))));
   const bar=el("div",{class:"toolbar"}); bar.append(semesterPicker(()=>viewTimetables(v)));
 
-  // A supervisor can only set class time if they are a principal for at least
-  // one student this semester. Co-supervisors do not run classes.
   let isPrincipalSomewhere=false;
   if(S.role==="supervisor"){
     const myStudents=await DB.list("students", S.activeSem?{semesterId:S.activeSem}:{});
@@ -719,7 +815,7 @@ async function viewTimetables(v){
 
   if(S.role==="supervisor" && !isPrincipalSomewhere){
     v.append(emptyState("Class time is set by principal supervisors",
-      "You are not a principal supervisor this semester, so you don't run a weekly class. You can still set consultation times under the Consultations tab."));
+      "You are not a principal supervisor this semester, so you don't run a weekly class. You can still set consultation times under the Consultation times tab."));
     return;
   }
 
@@ -733,7 +829,6 @@ async function viewTimetables(v){
   const tb=el("tbody",{});
   tts.sort((a,b)=>DAYS.indexOf(a.day)-DAYS.indexOf(b.day));
   for(const tt of tts){
-    const supName=S.supervisors.find(u=>u.id===tt.supervisorUid)?.name||tt.supervisorUid;
     const unit=unitById(sem,tt.unitId);
     const actions=el("div",{class:"row"});
     if(S.role==="supervisor"&&tt.supervisorUid===S.uid){
@@ -743,10 +838,13 @@ async function viewTimetables(v){
     if(S.role==="admin"){
       if(tt.status!=="approved") actions.append(el("button",{class:"btn sm",onclick:async()=>{await DB.update("timetables",tt.id,{status:"approved"});toast("Approved.");viewTimetables(v);}},"Approve"));
       else actions.append(el("button",{class:"btn ghost sm",onclick:async()=>{await DB.update("timetables",tt.id,{status:"pending"});viewTimetables(v);}},"Unapprove"));
+      // admin may edit & delete any class time
+      actions.append(el("button",{class:"btn ghost sm",onclick:()=>timetableForm(tt,()=>viewTimetables(v),true)},"Edit"),
+        el("button",{class:"btn danger sm",onclick:()=>confirmDelete("timetables",tt.id,"this class time",()=>viewTimetables(v))},"Delete"));
     }
     tb.append(el("tr",{},
       el("td",{},el("strong",{},unit?.code||"—")),
-      el("td",{},supName),
+      el("td",{},supName(tt.supervisorUid)),
       el("td",{},tt.day),
       el("td",{},`${tt.start}–${tt.end}`),
       el("td",{},tt.room||"—"),
@@ -758,8 +856,8 @@ async function viewTimetables(v){
 function statusPill(s){ const cls=s==="approved"?"approved":s==="pending"?"pending":"none";
   return el("span",{class:"pill "+cls},s==="approved"?"Approved":s==="pending"?"Awaiting admin":"—"); }
 
-function timetableForm(existing,done){
-  const sem=activeSemester();
+function timetableForm(existing,done,asAdmin){
+  const sem= existing? semOf(existing.semesterId)||activeSemester() : activeSemester();
   const units=unitsOf(sem);
   if(!units.length){ toast("Add a unit to this semester first.",true); return; }
   const unitSel=el("select",{},...units.map(u=>el("option",{value:u.id,...(u.id===existing?.unitId?{selected:"selected"}:{})},
@@ -779,179 +877,595 @@ function timetableForm(existing,done){
     ),
     async()=>{
       if(start.value>=end.value){ toast("End time must be after start.",true); return false; }
-      if(!S.activeSem){ toast("No semester selected.",true); return false; }
-      const data={semesterId:S.activeSem,unitId:unitSel.value,supervisorUid:S.uid,day:day.value,start:start.value,end:end.value,room:room.value.trim(),status:"pending"};
-      if(existing) await DB.update("timetables",existing.id,data); else await DB.add("timetables",data);
-      toast("Saved — sent for admin approval."); done(); return true;
+      const data={unitId:unitSel.value,day:day.value,start:start.value,end:end.value,room:room.value.trim()};
+      if(existing){ await DB.update("timetables",existing.id,data); }
+      else { await DB.add("timetables",{semesterId:S.activeSem,supervisorUid:S.uid,status:"pending",...data}); }
+      toast(existing?"Class time updated.":"Saved — sent for admin approval."); done(); return true;
     });
 }
 
 /* ============================================================
    8. CONSULTATIONS TAB
-   Both the principal AND the co-supervisor may set their own
-   consultation / meeting time for a student. Each consultation
-   row is keyed by supervisorUid + supervisorRole, so a student
-   can show one principal time and one co-supervisor time.
-   Admin approves each. A supervisor only edits their OWN row.
+   The PRINCIPAL supervisor sets ONE recurring consultation time +
+   meeting link per allocated student. No admin approval needed —
+   times can change week to week (handled in the Meeting log tab).
    ============================================================ */
 async function viewConsultations(v){
   v.innerHTML="";
+  const sem=activeSemester();
   v.append(el("div",{class:"section-title"},el("div",{},
     el("div",{class:"eyebrow ui"},"Per-student supervision"),
-    el("h2",{},"Consultation times"))));
+    el("h2",{},S.role==="admin"?"Consultation times":"My consultation times"))));
   const bar=el("div",{class:"toolbar"}); bar.append(semesterPicker(()=>viewConsultations(v)));
   v.append(bar);
   v.append(el("p",{class:"muted ui",style:"margin-top:-6px"},
-    "Principal and co-supervisor can each set their own meeting time for a student. Admin approval confirms it for the student."));
+    "The principal supervisor sets a recurring meeting time and a meeting link for each allocated student. No admin sign-off needed. Use the Meeting log to change a single week or to record attendance."));
 
   let students=await DB.list("students", S.activeSem?{semesterId:S.activeSem}:{});
-  if(S.role==="supervisor") students=students.filter(s=>s.principalUid===S.uid||s.coUid===S.uid);
+  if(S.role==="supervisor") students=students.filter(s=>s.principalUid===S.uid);
   let cons=await DB.list("consultations", S.activeSem?{semesterId:S.activeSem}:{});
-  if(!students.length){ v.append(emptyState("No students to schedule","Add students first.")); return; }
+  if(!students.length){
+    v.append(emptyState(S.role==="supervisor"?"No students assigned to you as principal":"No students yet",
+      S.role==="supervisor"?"Consultation times are set by the principal supervisor.":"Add students first."));
+    return;
+  }
 
   const card=el("div",{class:"card",style:"padding:0;overflow:hidden"});
   const t=el("table",{});
-  t.append(el("thead",{},el("tr",{},...["Student","Campus","Supervisor","Role","Consultation","Status",""].map(h=>el("th",{},h)))));
+  t.append(el("thead",{},el("tr",{},...["Student","Campus","Principal","Recurring time","Mode","Meeting link",""].map(h=>el("th",{},h)))));
   const tb=el("tbody",{});
 
   for(const s of students){
-    // Build the list of supervisor "slots" for this student.
-    const slots=[];
-    if(s.principalUid) slots.push({uid:s.principalUid,role:"principal",name:s.principalName||"—"});
-    if(s.coUid)        slots.push({uid:s.coUid,       role:"co",       name:s.coName||"—"});
-    if(!slots.length)  slots.push({uid:"",role:"principal",name:"—"}); // unassigned student still listed
+    const c=cons.find(x=>x.studentDocId===s.id && x.supervisorUid===s.principalUid);
+    const isMine=S.role==="supervisor" && s.principalUid===S.uid;
+    const isAdmin=S.role==="admin";
 
-    let firstRowForStudent=true;
-    for(const slot of slots){
-      const c=cons.find(x=>x.studentDocId===s.id && x.supervisorUid===slot.uid);
-      const isMine=S.role==="supervisor" && slot.uid===S.uid;
-      const isAdmin=S.role==="admin";
-
-      const actions=el("div",{class:"row"});
-      if(isMine){
-        actions.append(el("button",{class:"btn ghost sm",
-          onclick:()=>consultForm(s,slot,c,()=>viewConsultations(v))}, c?"Edit":"Set time"));
-        if(c) actions.append(el("button",{class:"btn danger sm",
-          onclick:()=>confirmDelete("consultations",c.id,"this consultation",()=>viewConsultations(v))},"Delete"));
-      }
-      if(isAdmin && c){
-        if(c.status!=="approved") actions.append(el("button",{class:"btn sm",onclick:async()=>{await DB.update("consultations",c.id,{status:"approved"});toast("Approved.");viewConsultations(v);}},"Approve"));
-        else actions.append(el("button",{class:"btn ghost sm",onclick:async()=>{await DB.update("consultations",c.id,{status:"pending"});viewConsultations(v);}},"Unapprove"));
-      }
-
-      const roleTag=el("span",{class:"pill "+(slot.role==="principal"?"approved":"none"),style:"font-size:10.5px"},
-        slot.role==="principal"?"Principal":"Co-supervisor");
-
-      const cells=[
-        // student name cell only on the first row of each student
-        firstRowForStudent ? el("td",{},el("strong",{},s.name)) : el("td",{class:"muted"},""),
-        firstRowForStudent ? el("td",{},s.campus) : el("td",{},""),
-        el("td",{},slot.name||"—"),
-        el("td",{},roleTag),
-        el("td",{},c?`${c.day} ${c.start}–${c.end}${c.mode?" · "+c.mode:""}`:el("span",{class:"muted"},"Not set")),
-        el("td",{},c?statusPill(c.status):statusPill("none")),
-        el("td",{},actions)
-      ];
-      tb.append(el("tr",{},...cells));
-      firstRowForStudent=false;
+    const actions=el("div",{class:"row"});
+    if(isMine){
+      actions.append(el("button",{class:"btn ghost sm",onclick:()=>consultForm(s,c,()=>viewConsultations(v))}, c?"Edit":"Set time"));
+      if(c) actions.append(el("button",{class:"btn danger sm",onclick:()=>confirmDelete("consultations",c.id,"this consultation",()=>viewConsultations(v))},"Delete"));
     }
+    if(isAdmin){
+      // admin may edit or delete any consultation
+      actions.append(el("button",{class:"btn ghost sm",onclick:()=>consultForm(s,c,()=>viewConsultations(v))}, c?"Edit":"Set time"));
+      if(c) actions.append(el("button",{class:"btn danger sm",onclick:()=>confirmDelete("consultations",c.id,"this consultation",()=>viewConsultations(v))},"Delete"));
+    }
+
+    const link = c?.meetingLink
+      ? el("a",{class:"linkpill",href:c.meetingLink,target:"_blank",rel:"noopener"},"Open link")
+      : el("span",{class:"muted"},"—");
+
+    tb.append(el("tr",{},
+      el("td",{},el("strong",{},s.name)),
+      el("td",{},s.campus),
+      el("td",{},s.principalName||"—"),
+      el("td",{},c?`${c.day} ${c.start}–${c.end}`:el("span",{class:"muted"},"Not set")),
+      el("td",{},c?.mode||el("span",{class:"muted"},"—")),
+      el("td",{},link),
+      el("td",{},actions)));
   }
   t.append(tb); card.append(t); v.append(card);
 }
-function consultForm(student,slot,existing,done){
+
+function consultForm(student,existing,done){
   const day=el("select",{},...DAYS.map(d=>el("option",{value:d,...(d===existing?.day?{selected:"selected"}:{})},d)));
   const start=el("input",{type:"time",value:existing?.start||"14:00"});
   const end=el("input",{type:"time",value:existing?.end||"14:30"});
-  const mode=el("select",{},...["In person","Online","Hybrid"].map(m=>el("option",{value:m,...(m===existing?.mode?{selected:"selected"}:{})},m)));
-  const roleWord=slot.role==="principal"?"principal supervisor":"co-supervisor";
-  modal("Consultation for "+student.name,
+  const mode=el("select",{},...["Online","In person","Hybrid"].map(m=>el("option",{value:m,...(m===existing?.mode?{selected:"selected"}:{})},m)));
+  const link=el("input",{value:existing?.meetingLink||"",placeholder:"https://teams.microsoft.com/… (Teams channel / meeting)"});
+  modal((existing?"Edit":"Set")+" consultation — "+student.name,
     el("div",{class:"grid",style:"grid-template-columns:1fr 1fr"},
-      el("div",{style:"grid-column:1/-1"},el("p",{class:"muted",style:"margin:0 0 4px"},"You are setting this as the "+roleWord+".")),
-      el("div",{style:"grid-column:1/-1"},el("label",{},"Day"),day),
+      el("div",{style:"grid-column:1/-1"},el("p",{class:"muted",style:"margin:0"},
+        "This recurring time applies every week. To change one week or to record attendance, use the Meeting log tab. No admin approval is required.")),
+      el("div",{style:"grid-column:1/-1"},el("label",{},"Day of week"),day),
       el("div",{},el("label",{},"Start"),start),
       el("div",{},el("label",{},"End"),end),
       el("div",{style:"grid-column:1/-1"},el("label",{},"Mode"),mode),
-      el("div",{style:"grid-column:1/-1"},el("p",{class:"muted",style:"margin:0"},"Admin must approve before the student sees it as confirmed. The other supervisor can also set their own time independently."))
+      el("div",{style:"grid-column:1/-1"},el("label",{},"Meeting link (Teams individual channel)"),link)
     ),
     async()=>{
       if(start.value>=end.value){ toast("End must be after start.",true); return false; }
-      const data={semesterId:S.activeSem,studentDocId:student.id,supervisorUid:S.uid,supervisorRole:slot.role,
-        day:day.value,start:start.value,end:end.value,mode:mode.value,status:"pending"};
-      if(existing) await DB.update("consultations",existing.id,data); else await DB.add("consultations",data);
-      toast("Saved — sent for admin approval."); done(); return true;
+      const data={
+        semesterId:student.semesterId||S.activeSem, studentDocId:student.id,
+        supervisorUid:student.principalUid, principalName:student.principalName||"",
+        coUid:student.coUid||"", coName:student.coName||"",
+        day:day.value, start:start.value, end:end.value, mode:mode.value,
+        meetingLink:link.value.trim()
+      };
+      if(existing){ await DB.update("consultations",existing.id,data); }
+      else { await DB.add("consultations",{...data, weeks:{}}); }
+      toast("Consultation time saved."); done(); return true;
     });
 }
 
 /* ============================================================
-   9. ATTENDANCE TAB (principal marks weekly; admin views)
+   9. MEETING LOG TAB  (principal logs each week; admin views)
+   Per student, per week: held? · student attended? · co attended?
+   · optional time override · comment. Saved into consultations.weeks.
    ============================================================ */
-async function viewAttendance(v){
+async function viewMeetingLog(v){
   v.innerHTML="";
   const sem=activeSemester();
   const weeks=sem?.weeks||12;
   v.append(el("div",{class:"section-title"},el("div",{},
-    el("div",{class:"eyebrow ui"},"Weekly meeting log · "+weeks+" weeks"),
-    el("h2",{},"Attendance"))));
-  const bar=el("div",{class:"toolbar"}); bar.append(semesterPicker(()=>viewAttendance(v)));
-  v.append(bar, el("p",{class:"muted ui",style:"margin-top:-6px"},
-    "Tap a cell to cycle: — (none) → P (present) → A (absent) → E (excused). "+
-    (S.role==="admin"?"Read-only for admin.":"")));
+    el("div",{class:"eyebrow ui"},"Per-student weekly record · "+weeks+" weeks"),
+    el("h2",{},"Supervision diary"))));
+  const bar=el("div",{class:"toolbar"}); bar.append(semesterPicker(()=>viewMeetingLog(v)));
+  v.append(bar);
 
   let students=await DB.list("students", S.activeSem?{semesterId:S.activeSem}:{});
   if(S.role==="supervisor") students=students.filter(s=>s.principalUid===S.uid);
-  if(!students.length){ v.append(emptyState("No students to track",S.role==="supervisor"?"You only mark attendance for students you principally supervise.":"Add students first.")); return; }
-  const att=await DB.list("attendance", S.activeSem?{semesterId:S.activeSem}:{});
-  const recFor=s=>att.find(a=>a.studentDocId===s.id);
-
-  const wrap=el("div",{class:"att-grid"});
-  const t=el("table",{});
-  const hr=el("tr",{},el("th",{},"Student"),el("th",{},"Campus"));
-  for(let w=1;w<=weeks;w++) hr.append(el("th",{style:"text-align:center"},"W"+w));
-  hr.append(el("th",{style:"text-align:center"},"% present"));
-  t.append(el("thead",{},hr));
-  const tb=el("tbody",{});
-  const CYCLE={"-":"P","P":"A","A":"E","E":"-"};
-  for(const s of students){
-    const rec=recFor(s); const weeksMap=rec?.weeks||{};
-    const tr=el("tr",{},el("td",{},el("strong",{},s.name)),el("td",{},s.campus));
-    const cells=[];
-    for(let w=1;w<=weeks;w++){
-      const val=weeksMap[w]||"-";
-      const cell=el("td",{class:"att-cell "+val},val==="-"?"·":val);
-      cell.dataset.w=w;
-      if(S.role==="supervisor"){
-        cell.onclick=async()=>{
-          const cur=cell.classList.contains("P")?"P":cell.classList.contains("A")?"A":cell.classList.contains("E")?"E":"-";
-          const next=CYCLE[cur];
-          cell.className="att-cell "+next; cell.textContent=next==="-"?"·":next;
-          // persist
-          let r=recFor(s);
-          const newWeeks={...(r?.weeks||{}),[w]:next};
-          if(next==="-") delete newWeeks[w];
-          if(r){ await DB.update("attendance",r.id,{weeks:newWeeks}); r.weeks=newWeeks; }
-          else { const id=await DB.add("attendance",{semesterId:S.activeSem,studentDocId:s.id,supervisorUid:S.uid,weeks:newWeeks,notes:{}}); att.push({id,studentDocId:s.id,weeks:newWeeks}); }
-          // refresh pct
-          pct.textContent=calcPct(recFor(s)?.weeks||newWeeks,weeks);
-        };
-      }
-      cells.push(cell); tr.append(cell);
-    }
-    const pct=el("td",{style:"text-align:center;font-weight:700",class:"ui"},calcPct(weeksMap,weeks));
-    tr.append(pct);
-    tb.append(tr);
+  if(!students.length){
+    v.append(emptyState("No students to log",
+      S.role==="supervisor"?"You log meetings for students you principally supervise.":"Add students first."));
+    return;
   }
-  t.append(tb); wrap.append(t); v.append(wrap);
+  let cons=await DB.list("consultations", S.activeSem?{semesterId:S.activeSem}:{});
+
+  // pick student
+  const sel=el("select",{style:"width:auto;min-width:220px"});
+  students.forEach(s=>sel.append(el("option",{value:s.id},s.name+" · "+s.campus)));
+  const picker=el("div",{class:"toolbar"},el("div",{class:"field"},el("label",{},"Student"),sel));
+  v.append(picker);
+
+  const panel=el("div",{});
+  v.append(panel);
+
+  function consFor(studentId){
+    const s=students.find(x=>x.id===studentId);
+    return cons.find(c=>c.studentDocId===studentId && c.supervisorUid===s.principalUid);
+  }
+
+  async function renderStudent(studentId){
+    panel.innerHTML="";
+    const s=students.find(x=>x.id===studentId);
+    let c=consFor(studentId);
+
+    // summary strip
+    const stats = c ? consultStats(c,weeks) : {held:0,attended:0,missed:0,logged:0};
+    const strip=el("div",{class:"stat"},
+      statBox(String(stats.held),"Meetings held"),
+      statBox(String(stats.attended),"Student attended"),
+      statBox(String(stats.missed),"Student missed"),
+      statBox(stats.held?Math.round(stats.attended/stats.held*100)+"%":"—","Attendance rate"));
+    panel.append(strip);
+
+    if(!c){
+      panel.append(el("div",{class:"card"},
+        el("p",{class:"muted",style:"margin:0 0 10px"},
+          "No recurring consultation time is set for "+s.name+" yet."),
+        S.role==="supervisor"&&s.principalUid===S.uid
+          ? el("button",{class:"btn",onclick:()=>consultForm(s,null,()=>renderStudentAfterReload(studentId))},"Set consultation time")
+          : el("span",{class:"muted"},"The principal supervisor needs to set a time first.")));
+      return;
+    }
+
+    // header card: recurring time + link
+    const head=el("div",{class:"card",style:"margin-bottom:14px"});
+    head.append(
+      el("div",{class:"row",style:"justify-content:space-between;align-items:flex-start"},
+        el("div",{},
+          el("div",{class:"eyebrow ui"},"Recurring consultation"),
+          el("div",{style:"font-size:20px;font-weight:700"},`${c.day} ${c.start}–${c.end}`),
+          el("div",{class:"muted ui",style:"margin-top:2px"},(c.mode||"")+(c.coName?" · Co-supervisor: "+c.coName:" · No co-supervisor"))),
+        el("div",{class:"row"},
+          c.meetingLink?el("a",{class:"linkpill",href:c.meetingLink,target:"_blank",rel:"noopener"},"Meeting link"):el("span",{class:"muted"},"No link set"),
+          (s.principalUid===S.uid||S.role==="admin")?el("button",{class:"btn ghost sm",onclick:()=>consultForm(s,c,()=>renderStudentAfterReload(studentId))},"Edit time / link"):"")));
+    panel.append(head);
+
+    const canEdit = (S.role==="supervisor" && s.principalUid===S.uid);
+
+    const log=el("div",{class:"weeklog"});
+    for(let w=1;w<=weeks;w++){
+      log.append(weekRow(c,s,w,canEdit,studentId));
+    }
+    panel.append(log);
+
+    if(!canEdit && S.role==="admin"){
+      panel.append(el("p",{class:"muted ui",style:"margin-top:10px"},
+        "Read-only for admin. To change times, links or the whole record, use Edit time / link above or the Consultations tab."));
+    }
+  }
+
+  function weekRow(c,s,w,canEdit,studentId){
+    const et=weekTime(c,w);
+    const l=weekLog(c,w);
+    const wk=el("div",{class:"wk"},el("div",{class:"num"},String(w)),el("div",{class:"lab"},"Week"));
+    const body=el("div",{class:"wbody"});
+
+    // meta line: effective time + override marker
+    const meta=el("div",{class:"wmeta"});
+    meta.append(el("span",{},`${et.day} ${et.start}–${et.end}`));
+    if(et.mode) meta.append(el("span",{},"· "+et.mode));
+    if(et.overridden) meta.append(el("span",{class:"pill blue",style:"font-size:11.5px"},"Changed this week"));
+    if(et.link) meta.append(el("a",{class:"linkpill",href:et.link,target:"_blank",rel:"noopener"},"Link"));
+    if(canEdit) meta.append(el("button",{class:"btn ghost xs",onclick:()=>weekOverrideForm(c,w,()=>renderStudentAfterReload(studentId))},
+      et.overridden?"Edit this week":"Change time"));
+    body.append(meta);
+
+    // controls line
+    const controls=el("div",{class:"row",style:"margin-top:8px;gap:14px"});
+
+    // Held?
+    controls.append(toggleGroup("Meeting held", l.held===true?"yes":l.held===false?"no":null,
+      [["Held","yes","yes"],["Not held","no","no"]],
+      canEdit, async(val)=>{
+        const held = val==="yes";
+        await patchWeek(c,w,{held});
+        renderStudentAfterReload(studentId);
+      }));
+
+    // Student attended? (only meaningful if held)
+    controls.append(toggleGroup("Student", l.studentAttended===true?"yes":l.studentAttended===false?"no":null,
+      [["Attended","yes","yes"],["Absent","no","no"]],
+      canEdit && l.held===true, async(val)=>{
+        await patchWeek(c,w,{studentAttended: val==="yes"});
+        renderStudentAfterReload(studentId);
+      }));
+
+    // Co-supervisor attended? (only if a co exists & held)
+    if(c.coUid){
+      controls.append(toggleGroup("Co-supervisor",
+        l.coAttended==="yes"?"yes":l.coAttended==="no"?"no":l.coAttended==="na"?"na":null,
+        [["Attended","yes","yes"],["Absent","no","no"],["N/A","na","na"]],
+        canEdit && l.held===true, async(val)=>{
+          await patchWeek(c,w,{coAttended: val});
+          renderStudentAfterReload(studentId);
+        }));
+    }
+    body.append(controls);
+
+    // comment — saves automatically (debounced while typing, and on blur)
+    if(canEdit){
+      const ta=el("textarea",{placeholder:"Comment (optional) — e.g. progress, follow-ups, reason for absence"},l.comment||"");
+      const status=el("span",{class:"muted ui",style:"font-size:12.5px;margin-left:8px"},"");
+      let lastSaved=l.comment||"";
+      let timer=null, saving=false;
+      async function commit(){
+        const val=ta.value.trim();
+        if(val===lastSaved){ return; }      // nothing changed
+        if(saving) return;
+        saving=true; status.textContent="Saving…";
+        try{
+          await patchWeek(c,w,{comment:val}); // patchWeek updates the local copy too
+          lastSaved=val; status.textContent="Saved";
+          setTimeout(()=>{ if(status.textContent==="Saved") status.textContent=""; },1500);
+        }catch(e){
+          status.textContent="Not saved — check connection";
+        }finally{ saving=false; }
+      }
+      ta.addEventListener("input",()=>{
+        status.textContent="Editing…";
+        clearTimeout(timer); timer=setTimeout(commit,900); // debounce
+      });
+      ta.addEventListener("blur",()=>{ clearTimeout(timer); commit(); });
+      body.append(el("div",{class:"wcomment"},ta,
+        el("div",{style:"margin-top:3px"},status)));
+    } else if(l.comment){
+      body.append(el("div",{class:"wcomment muted",style:"font-style:italic"},"\u201C"+l.comment+"\u201D"));
+    }
+
+    // status pill
+    if(l.held===true){
+      const sp = l.studentAttended===true ? el("span",{class:"pill held"},"Attended")
+               : l.studentAttended===false ? el("span",{class:"pill missed"},"Missed")
+               : el("span",{class:"pill none"},"Held");
+      meta.prepend(sp);
+    } else if(l.held===false){
+      meta.prepend(el("span",{class:"pill none"},"Not held"));
+    } else {
+      meta.prepend(el("span",{class:"pill none"},"No record"));
+    }
+
+    return el("div",{class:"wrow"},wk,body);
+  }
+
+  // persist a partial update to a single week, merging into that week's data.
+  // Writes only the one nested key (weeks.<n>) so Firestore can't drop it.
+  async function patchWeek(c,w,partial){
+    const key=String(w);
+    const prev=(c.weeks?.[key]) || (c.weeks?.[w]) || {};
+    const merged={...prev,...partial};
+    // strip undefined so Firestore doesn't choke
+    Object.keys(merged).forEach(k=>merged[k]===undefined&&delete merged[k]);
+    await DB.updateWeek(c.id, key, merged);
+    if(!c.weeks) c.weeks={};
+    c.weeks[key]=merged; // keep local copy fresh
+  }
+
+  async function renderStudentAfterReload(studentId){
+    cons=await DB.list("consultations", S.activeSem?{semesterId:S.activeSem}:{});
+    renderStudent(studentId);
+  }
+
+  sel.onchange=()=>renderStudent(sel.value);
+  renderStudent(sel.value);
 }
-function calcPct(weeksMap,total){
-  const marked=Object.values(weeksMap||{});
-  const present=marked.filter(x=>x==="P").length;
-  const counted=marked.filter(x=>x==="P"||x==="A").length;
-  if(!counted) return "—";
-  return Math.round(present/counted*100)+"%";
+
+function statBox(n,l){ return el("div",{class:"b"},el("div",{class:"n"},n),el("div",{class:"l"},l)); }
+
+// A small yes/no(/na) toggle group
+function toggleGroup(label,current,options,enabled,onPick){
+  const seg=el("div",{class:"seg3"});
+  options.forEach(([txt,val,kind])=>{
+    const b=el("button",{class:(current===val?"on "+kind:"")},txt);
+    if(enabled) b.onclick=()=>onPick(val); else b.disabled=true;
+    seg.append(b);
+  });
+  return el("div",{},el("div",{class:"muted ui",style:"font-size:12px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;font-weight:600"},label),seg);
+}
+
+// Override a single week's time / link
+function weekOverrideForm(c,w,done){
+  const cur=(c.weeks?.[w]) || (c.weeks?.[String(w)]) || {};
+  const useDefault=el("input",{type:"checkbox",style:"width:auto",...(!(cur.day||cur.start||cur.end||cur.mode||cur.link)?{checked:"checked"}:{})});
+  const day=el("select",{},...DAYS.map(d=>el("option",{value:d,...(d===(cur.day||c.day)?{selected:"selected"}:{})},d)));
+  const start=el("input",{type:"time",value:cur.start||c.start});
+  const end=el("input",{type:"time",value:cur.end||c.end});
+  const mode=el("select",{},...["Online","In person","Hybrid"].map(m=>el("option",{value:m,...(m===(cur.mode||c.mode)?{selected:"selected"}:{})},m)));
+  const link=el("input",{value:cur.link||"",placeholder:"Leave blank to use the recurring link"});
+
+  modal("Week "+w+" — change time",
+    el("div",{class:"grid"},
+      el("label",{class:"ui",style:"display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-weight:500;color:var(--ink)"},
+        useDefault," Use the recurring time for this week (no change)"),
+      el("div",{class:"grid",style:"grid-template-columns:1fr 1fr"},
+        el("div",{style:"grid-column:1/-1"},el("label",{},"Day"),day),
+        el("div",{},el("label",{},"Start"),start),
+        el("div",{},el("label",{},"End"),end),
+        el("div",{style:"grid-column:1/-1"},el("label",{},"Mode"),mode),
+        el("div",{style:"grid-column:1/-1"},el("label",{},"Meeting link for this week"),link))),
+    async()=>{
+      const key=String(w);
+      const keep=(c.weeks?.[key]) || (c.weeks?.[w]) || {};
+      // preserve the logging fields (held / attendance / comment), only change overrides
+      const logged={held:keep.held,studentAttended:keep.studentAttended,coAttended:keep.coAttended,comment:keep.comment};
+      let weekData;
+      if(useDefault.checked){
+        weekData={...logged}; // strip overrides — back to recurring time
+      } else {
+        if(start.value>=end.value){ toast("End must be after start.",true); return false; }
+        weekData={...logged, day:day.value,start:start.value,end:end.value,mode:mode.value,link:link.value.trim()};
+      }
+      // clean undefined keys
+      Object.keys(weekData).forEach(k=>weekData[k]===undefined&&delete weekData[k]);
+      await DB.updateWeek(c.id, key, weekData);
+      if(!c.weeks) c.weeks={};
+      c.weeks[key]=weekData; // local copy fresh so re-render shows the new time
+      toast("Week "+w+" updated."); done(); return true;
+    });
+}
+
+
+/* ============================================================
+   9b. CO-SUPERVISOR LOG  (principal & admin)
+   Ad-hoc record of co-supervisor involvement per student. Unlike
+   the weekly Supervision diary, entries are created on demand —
+   add as many or as few sessions as needed, each with its own date,
+   title, whether the co-supervisor attended, and a note.
+   ============================================================ */
+async function viewCoSupLog(v){
+  v.innerHTML="";
+  v.append(el("div",{class:"section-title"},el("div",{},
+    el("div",{class:"eyebrow ui"},"Co-supervisor involvement"),
+    el("h2",{},"Co-supervisor log"))));
+  const bar=el("div",{class:"toolbar"}); bar.append(semesterPicker(()=>viewCoSupLog(v)));
+  v.append(bar);
+  v.append(el("p",{class:"muted ui",style:"margin-top:-6px"},
+    "A flexible record of when the co-supervisor was involved with a student. Add an entry for each session, review, or meeting — there's no fixed weekly schedule. Principals log for their own students; admins can log for anyone."));
+
+  // students this user may log against
+  let students=await DB.list("students", S.activeSem?{semesterId:S.activeSem}:{});
+  if(S.role==="supervisor") students=students.filter(s=>s.principalUid===S.uid);
+  // only students that actually have a co-supervisor are loggable
+  const withCo=students.filter(s=>s.coUid);
+  if(!withCo.length){
+    v.append(emptyState("No students with a co-supervisor",
+      S.role==="supervisor"
+        ? "None of your students have a co-supervisor assigned this semester."
+        : "Assign a co-supervisor to a student first (Students tab)."));
+    return;
+  }
+
+  // student picker
+  const sel=el("select",{style:"width:auto;min-width:240px"});
+  withCo.forEach(s=>sel.append(el("option",{value:s.id},s.name+" · co: "+(s.coName||"—"))));
+  v.append(el("div",{class:"toolbar"},el("div",{class:"field"},el("label",{},"Student"),sel)));
+
+  const panel=el("div",{});
+  v.append(panel);
+
+  async function renderFor(studentId){
+    panel.innerHTML="";
+    const s=withCo.find(x=>x.id===studentId);
+    let logs=(await DB.list("costLogs", S.activeSem?{semesterId:S.activeSem}:{}))
+      .filter(l=>l.studentDocId===studentId);
+    logs.sort((a,b)=>(a.date<b.date?1:-1)); // newest first
+
+    // summary
+    const total=logs.length;
+    const present=logs.filter(l=>l.coAttended==="yes").length;
+    const absent=logs.filter(l=>l.coAttended==="no").length;
+    panel.append(el("div",{class:"stat"},
+      statBox(String(total),"Log entries"),
+      statBox(String(present),"Co-supervisor present"),
+      statBox(String(absent),"Co-supervisor absent")));
+
+    // add button
+    panel.append(el("div",{class:"row",style:"margin-bottom:12px"},
+      el("button",{class:"btn",onclick:()=>coSupForm(s,null,()=>renderFor(studentId))},"+ Add log entry")));
+
+    if(!logs.length){
+      panel.append(emptyState("No entries yet for "+s.name,
+        "Add an entry whenever the co-supervisor ("+(s.coName||"—")+") meets the student or contributes to supervision."));
+      return;
+    }
+
+    const card=el("div",{class:"card",style:"padding:0;overflow:hidden"});
+    const t=el("table",{});
+    t.append(el("thead",{},el("tr",{},...["Date","Title","Co-supervisor","Attended","Note","Logged by",""].map(h=>el("th",{},h)))));
+    const tb=el("tbody",{});
+    logs.forEach(l=>{
+      const att = l.coAttended==="yes" ? el("span",{class:"pill held"},"Attended")
+                : l.coAttended==="no"  ? el("span",{class:"pill missed"},"Absent")
+                : el("span",{class:"pill none"},"N/A");
+      const actions=el("div",{class:"row"});
+      // principal who owns the student, or admin, can edit/delete
+      const canEdit = S.role==="admin" || (S.role==="supervisor" && s.principalUid===S.uid);
+      if(canEdit){
+        actions.append(el("button",{class:"btn ghost sm",onclick:()=>coSupForm(s,l,()=>renderFor(studentId))},"Edit"),
+          el("button",{class:"btn danger sm",onclick:()=>confirmDelete("costLogs",l.id,"this log entry",()=>renderFor(studentId))},"Delete"));
+      }
+      tb.append(el("tr",{},
+        el("td",{},el("strong",{},fmtDate(l.date))),
+        el("td",{},l.title||"—"),
+        el("td",{},l.coName||"—"),
+        el("td",{},att),
+        el("td",{class:"muted",style:"max-width:280px;white-space:normal"},l.note||"—"),
+        el("td",{class:"muted"},l.createdByName||"—"),
+        el("td",{},actions)));
+    });
+    t.append(tb); card.append(t); panel.append(card);
+  }
+
+  sel.onchange=()=>renderFor(sel.value);
+  renderFor(sel.value);
+}
+
+function fmtDate(d){
+  if(!d) return "—";
+  const dt=new Date(d+"T00:00:00");
+  if(isNaN(dt)) return d;
+  return dt.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});
+}
+
+function coSupForm(student,existing,done){
+  const today=new Date().toISOString().slice(0,10);
+  const date=el("input",{type:"date",value:existing?.date||today});
+  const title=el("input",{value:existing?.title||"",placeholder:"e.g. Methodology review, draft feedback"});
+  const att=el("select",{},
+    el("option",{value:"yes",...(existing?.coAttended==="yes"?{selected:"selected"}:{})},"Co-supervisor attended"),
+    el("option",{value:"no",...(existing?.coAttended==="no"?{selected:"selected"}:{})},"Co-supervisor absent"),
+    el("option",{value:"na",...(existing?.coAttended==="na"?{selected:"selected"}:{})},"Not applicable"));
+  const note=el("textarea",{placeholder:"What was discussed or contributed?"},existing?.note||"");
+  modal((existing?"Edit":"Add")+" co-supervisor log — "+student.name,
+    el("div",{class:"grid"},
+      el("p",{class:"muted",style:"margin:0"},"Co-supervisor for this student: "+(student.coName||"—")+". No admin approval needed."),
+      el("div",{class:"grid",style:"grid-template-columns:1fr 1fr"},
+        el("div",{},el("label",{},"Date"),date),
+        el("div",{},el("label",{},"Co-supervisor attendance"),att)),
+      el("div",{},el("label",{},"Title / topic"),title),
+      el("div",{},el("label",{},"Note"),note)),
+    async()=>{
+      if(!date.value){ toast("Choose a date.",true); return false; }
+      const data={
+        semesterId:student.semesterId||S.activeSem, studentDocId:student.id, studentName:student.name,
+        coUid:student.coUid||"", coName:student.coName||"",
+        createdByUid:S.uid, createdByName:S.userName||"",
+        date:date.value, title:title.value.trim(), coAttended:att.value, note:note.value.trim()
+      };
+      if(existing) await DB.update("costLogs",existing.id,data);
+      else await DB.add("costLogs",data);
+      toast(existing?"Entry updated.":"Entry added."); done(); return true;
+    });
 }
 
 /* ============================================================
-   10. MOODLE EXPORT (admin) — CSV + printable
+   10. SUMMARY REPORT (admin) — oversight + CSV
+   Shows, per principal supervisor and per student, whether the
+   consultation is arranged, how many meetings held, and attendance.
+   ============================================================ */
+async function viewReport(v){
+  v.innerHTML="";
+  const sem=activeSemester();
+  const weeks=sem?.weeks||12;
+  v.append(el("div",{class:"section-title"},el("div",{},
+    el("div",{class:"eyebrow ui"},"Oversight · "+(sem?.label||""),),
+    el("h2",{},"Supervision summary"))));
+  const bar=el("div",{class:"toolbar"}); bar.append(semesterPicker(()=>viewReport(v)));
+  v.append(bar);
+
+  const students=await DB.list("students", S.activeSem?{semesterId:S.activeSem}:{});
+  const cons=await DB.list("consultations", S.activeSem?{semesterId:S.activeSem}:{});
+  if(!students.length){ v.append(emptyState("Nothing to report yet","Add students and meetings first.")); return; }
+
+  // overall stats
+  const rows=students.map(s=>{
+    const c=cons.find(x=>x.studentDocId===s.id && x.supervisorUid===s.principalUid);
+    const st=c?consultStats(c,weeks):{held:0,attended:0,missed:0,logged:0};
+    return {s,c,st,arranged:!!c};
+  });
+  const arranged=rows.filter(r=>r.arranged).length;
+  const noTime=rows.length-arranged;
+  const totalHeld=rows.reduce((a,r)=>a+r.st.held,0);
+  const totalAttended=rows.reduce((a,r)=>a+r.st.attended,0);
+
+  v.append(el("div",{class:"stat"},
+    statBox(String(rows.length),"Students"),
+    statBox(String(arranged),"Consultation set"),
+    statBox(String(noTime),"No time set"),
+    statBox(String(totalHeld),"Meetings held"),
+    statBox(totalHeld?Math.round(totalAttended/totalHeld*100)+"%":"—","Attendance rate")));
+
+  v.append(el("div",{class:"row",style:"margin-bottom:14px"},
+    el("button",{class:"btn",onclick:()=>downloadReportCSV(rows,sem,weeks)},"Download report CSV"),
+    el("button",{class:"btn ghost",onclick:()=>window.print()},"Print / PDF")));
+
+  // group by principal supervisor
+  const byPrin={};
+  rows.forEach(r=>{ const k=r.s.principalName||"Unassigned"; (byPrin[k] ||= []).push(r); });
+
+  Object.keys(byPrin).sort().forEach(prin=>{
+    const card=el("div",{class:"card",style:"margin-bottom:14px;padding:0;overflow:hidden"});
+    card.append(el("div",{style:"padding:11px 16px;background:#0000000a;border-bottom:1px solid var(--line);display:flex;justify-content:space-between"},
+      el("strong",{class:"ui"},"Principal: "+prin),
+      el("span",{class:"muted ui"},byPrin[prin].length+" student"+(byPrin[prin].length>1?"s":""))));
+    const t=el("table",{});
+    t.append(el("thead",{},el("tr",{},...["Student","Campus","Co-supervisor","Time arranged","Held","Attended","Missed","Co present","Last comment"].map(h=>el("th",{},h)))));
+    const tb=el("tbody",{});
+    byPrin[prin].forEach(({s,c,st})=>{
+      // co presence count
+      let coYes=0,coNo=0;
+      if(c) for(let w=1;w<=weeks;w++){ const l=weekLog(c,w); if(l?.coAttended==="yes")coYes++; else if(l?.coAttended==="no")coNo++; }
+      // last comment
+      let lastComment="";
+      if(c) for(let w=weeks;w>=1;w--){ const cm=weekLog(c,w)?.comment; if(cm){ lastComment="W"+w+": "+cm; break; } }
+      tb.append(el("tr",{},
+        el("td",{},el("strong",{},s.name)),
+        el("td",{},s.campus),
+        el("td",{},s.coName||"—"),
+        el("td",{}, c?el("span",{class:"pill held"},`${c.day} ${c.start}`):el("span",{class:"pill missed"},"Not set")),
+        el("td",{},String(st.held)),
+        el("td",{},String(st.attended)),
+        el("td",{},String(st.missed)),
+        el("td",{}, c?.coUid?`${coYes}/${coYes+coNo}`:el("span",{class:"muted"},"—")),
+        el("td",{class:"muted",style:"max-width:220px;white-space:normal"},lastComment||"—")));
+    });
+    t.append(tb); card.append(t); v.append(card);
+  });
+}
+function downloadReportCSV(rows,sem,weeks){
+  const head=["student","sid","campus","principal","co_supervisor","time_arranged","recurring_time","meetings_held","student_attended","student_missed","co_present","attendance_rate"];
+  const lines=[head.join(",")];
+  rows.forEach(({s,c,st})=>{
+    let coYes=0,coTot=0;
+    if(c) for(let w=1;w<=weeks;w++){ const l=weekLog(c,w); if(l?.coAttended==="yes"){coYes++;coTot++;} else if(l?.coAttended==="no")coTot++; }
+    const rate=st.held?Math.round(st.attended/st.held*100)+"%":"";
+    const cell=[
+      s.name,s.sid,s.campus,s.principalName||"",s.coName||"",
+      c?"yes":"no", c?`${c.day} ${c.start}-${c.end}`:"",
+      st.held,st.attended,st.missed, c?.coUid?`${coYes}/${coTot}`:"", rate
+    ];
+    lines.push(cell.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(","));
+  });
+  const blob=new Blob([lines.join("\n")],{type:"text/csv"});
+  const fname=`supervision_report_${(sem?.label||"export").replace(/\s+/g,"_")}.csv`;
+  const a=el("a",{href:URL.createObjectURL(blob),download:fname});
+  document.body.append(a); a.click(); a.remove(); toast("Report downloaded.");
+}
+
+/* ============================================================
+   11. MOODLE EXPORT (admin) — class timetable CSV + printable
    ============================================================ */
 async function viewExport(v){
   v.innerHTML="";
@@ -980,12 +1494,10 @@ async function viewExport(v){
   const tb=el("tbody",{});
   approved.sort((a,b)=>DAYS.indexOf(a.day)-DAYS.indexOf(b.day));
   approved.forEach(tt=>{
-    const sup=S.supervisors.find(u=>u.id===tt.supervisorUid);
     const unit=unitById(sem,tt.unitId);
-    // enrolment = students taking this unit who are supervised by this person
     const count=students.filter(s=>(s.unitIds||[]).includes(tt.unitId)&&(s.principalUid===tt.supervisorUid||s.coUid===tt.supervisorUid)).length;
     tb.append(el("tr",{},
-      el("td",{},unit?.code||"—"),el("td",{},unit?.name||"—"),el("td",{},sup?.name||tt.supervisorUid),
+      el("td",{},unit?.code||"—"),el("td",{},unit?.name||"—"),el("td",{},supName(tt.supervisorUid)),
       el("td",{},tt.day),el("td",{},`${tt.start}–${tt.end}`),el("td",{},tt.room||"—"),el("td",{},String(count))));
   });
   t.append(tb); card.append(t); v.append(card);
@@ -994,9 +1506,8 @@ function downloadTimetableCSV(rows,sem){
   const head=["unit","unit_name","semester","supervisor","day","start","end","room"];
   const lines=[head.join(",")];
   rows.forEach(tt=>{
-    const sup=S.supervisors.find(u=>u.id===tt.supervisorUid)?.name||tt.supervisorUid;
     const unit=unitById(sem,tt.unitId);
-    lines.push([unit?.code||"",unit?.name||"",sem?.label||"",sup,tt.day,tt.start,tt.end,(tt.room||"").replace(/,/g," ")].map(x=>`"${x}"`).join(","));
+    lines.push([unit?.code||"",unit?.name||"",sem?.label||"",supName(tt.supervisorUid),tt.day,tt.start,tt.end,(tt.room||"").replace(/,/g," ")].map(x=>`"${x}"`).join(","));
   });
   const blob=new Blob([lines.join("\n")],{type:"text/csv"});
   const fname=`timetable_${(sem?.label||"export").replace(/\s+/g,"_")}.csv`;
@@ -1005,7 +1516,7 @@ function downloadTimetableCSV(rows,sem){
 }
 
 /* ============================================================
-   11. SEMESTERS & STAFF (admin)
+   12. SEMESTERS & STAFF (admin) — full edit/delete on staff
    ============================================================ */
 async function viewPeople(v){
   v.innerHTML="";
@@ -1018,7 +1529,7 @@ async function viewPeople(v){
   semCard.append(el("div",{class:"row",style:"justify-content:space-between;margin-bottom:10px"},
     el("h3",{},"Semesters & units"),
     el("button",{class:"btn sm",onclick:()=>semesterForm(null,()=>viewPeople(v))},"+ Add semester")));
-  if(!S.semesters.length) semCard.append(el("p",{class:"muted"},"No semesters yet. Add one — give it a label like “S2 2026” and add the units that run in it."));
+  if(!S.semesters.length) semCard.append(el("p",{class:"muted"},"No semesters yet. Add one — give it a label like \u201CS2 2026\u201D and add the units that run in it."));
   else {
     const t=el("table",{}); t.append(el("thead",{},el("tr",{},...["Semester","Units","Weeks","",""].map(h=>el("th",{},h)))));
     const tb=el("tbody",{});
@@ -1044,30 +1555,40 @@ async function viewPeople(v){
   const staffCard=el("div",{class:"card"});
   staffCard.append(el("div",{class:"row",style:"justify-content:space-between;margin-bottom:10px"},
     el("h3",{},"Supervisors & admins"),
-    el("button",{class:"btn sm",onclick:()=>staffForm(()=>viewPeople(v))},"+ Add staff login")));
+    el("button",{class:"btn sm",onclick:()=>staffForm(null,()=>viewPeople(v))},"+ Add staff login")));
   staffCard.append(el("p",{class:"muted",style:"margin-top:-4px;margin-bottom:10px"},
-    "Each supervisor has a capability: principal & co, principal only, or co-supervisor only. That controls which slot they can fill on a student. Principals run the class and mark attendance; co-supervisors set a consultation only."));
+    "Each supervisor has a capability: principal & co, principal only, or co-supervisor only. Principals run the class, set consultation times and log meetings; co-supervisors attend meetings the principal logs."));
   const users=await DB.listUsers();
-  const t=el("table",{}); t.append(el("thead",{},el("tr",{},...["Name","Email","Account","Capability"].map(h=>el("th",{},h)))));
+  const t=el("table",{}); t.append(el("thead",{},el("tr",{},...["Name","Email","Account","Capability",""].map(h=>el("th",{},h)))));
   const tb=el("tbody",{});
-  users.forEach(u=>tb.append(el("tr",{},
-    el("td",{},el("strong",{},u.name||"—")),
-    el("td",{},u.email),
-    el("td",{},el("span",{class:"pill "+(u.role==="admin"?"approved":"none")},u.role)),
-    el("td",{},u.role==="supervisor"?el("span",{class:"pill "+(capOf(u)==="both"?"approved":"pending")},capLabel(capOf(u))):el("span",{class:"muted"},"—")))));
+  users.forEach(u=>{
+    const actions=el("div",{class:"row"});
+    // admin can edit & delete any staff record (supervisor or admin)
+    actions.append(el("button",{class:"btn ghost sm",onclick:()=>staffForm(u,()=>viewPeople(v))},"Edit"));
+    const isSelf = u.id===S.uid;
+    actions.append(el("button",{class:"btn danger sm",...(isSelf?{disabled:"disabled",title:"You can't delete your own account"}:{}),
+      onclick:()=> isSelf ? toast("You can't delete your own account.",true)
+                         : confirmDelete("users",u.id,u.name||u.email,async()=>{ await DB.removeUser(u.id); S.supervisors=(await DB.listUsers()).filter(x=>x.role==="supervisor"); viewPeople(v); }, true)},"Delete"));
+    tb.append(el("tr",{},
+      el("td",{},el("strong",{},u.name||"—")),
+      el("td",{},u.email),
+      el("td",{},el("span",{class:"pill "+(u.role==="admin"?"approved":"none")},u.role)),
+      el("td",{},u.role==="supervisor"?el("span",{class:"pill "+(capOf(u)==="both"?"approved":"pending")},capLabel(capOf(u))):el("span",{class:"muted"},"—")),
+      el("td",{},actions)));
+  });
   t.append(tb); staffCard.append(t);
-  if(!DEMO) staffCard.append(el("p",{class:"muted",style:"margin-top:10px"},"New staff are created with a Firebase Authentication login and can sign in immediately."));
+  if(!DEMO) staffCard.append(el("p",{class:"muted",style:"margin-top:10px"},"New staff are created with a Firebase Authentication login and can sign in immediately. Editing here updates their profile; deleting removes the profile record."));
   v.append(staffCard);
 }
+
 function semesterForm(existing,done){
   const label=el("input",{placeholder:"e.g. S2 2026",value:existing?.label||""});
   const weeks=el("select",{},
     el("option",{value:"12",...((existing?.weeks||12)===12?{selected:"selected"}:{})},"12 weeks"),
     el("option",{value:"15",...((existing?.weeks)===15?{selected:"selected"}:{})},"15 weeks"));
 
-  // Dynamic unit rows. Each row keeps its id (existing) or gets a new one on save.
   const unitList=el("div",{class:"grid",style:"gap:8px"});
-  const rows=[]; // {wrap, id, code, name}
+  const rows=[];
   function addRow(u){
     const id=u?.id||uid();
     const code=el("input",{value:u?.code||"",placeholder:"Code e.g. RES915"});
@@ -1106,24 +1627,42 @@ function semesterForm(existing,done){
       toast(existing?"Semester updated.":"Semester added."); done(); return true;
     });
 }
-function staffForm(done){
-  const name=el("input",{}), email=el("input",{type:"email"}), pass=el("input",{type:"password",placeholder:"Min 6 characters"});
-  const role=el("select",{},el("option",{value:"supervisor"},"Supervisor"),el("option",{value:"admin"},"Admin"));
+
+function staffForm(existing,done){
+  const editing=!!existing;
+  const name=el("input",{value:existing?.name||""}), email=el("input",{type:"email",value:existing?.email||"",...(editing?{disabled:"disabled"}:{})});
+  const pass=el("input",{type:"password",placeholder:editing?"(unchanged — set in Firebase)":"Min 6 characters"});
+  const role=el("select",{},
+    el("option",{value:"supervisor",...(existing?.role==="supervisor"?{selected:"selected"}:{})},"Supervisor"),
+    el("option",{value:"admin",...(existing?.role==="admin"?{selected:"selected"}:{})},"Admin"));
   const cap=el("select",{},
-    el("option",{value:"both"},"Principal & co-supervisor"),
-    el("option",{value:"principal"},"Principal only"),
-    el("option",{value:"co"},"Co-supervisor only"));
+    el("option",{value:"both",...(capOf(existing)==="both"?{selected:"selected"}:{})},"Principal & co-supervisor"),
+    el("option",{value:"principal",...(capOf(existing)==="principal"?{selected:"selected"}:{})},"Principal only"),
+    el("option",{value:"co",...(capOf(existing)==="co"?{selected:"selected"}:{})},"Co-supervisor only"));
   const capRow=el("div",{},el("label",{},"Supervisor capability"),cap);
-  role.onchange=()=>{ capRow.style.display = role.value==="supervisor" ? "" : "none"; };
-  modal("Add staff login",
-    el("div",{class:"grid"},
-      el("div",{},el("label",{},"Full name"),name),
-      el("div",{},el("label",{},"Email"),email),
-      el("div",{},el("label",{},"Temporary password"),pass),
-      el("div",{},el("label",{},"Account role"),role),
-      capRow,
-      el("div",{},el("p",{class:"muted",style:"margin:0"},"Creates a login account. Capability sets whether this supervisor can be a student's principal, co-supervisor, or either. Share the password so they can sign in and change it later."))),
+  const sync=()=>{ capRow.style.display = role.value==="supervisor" ? "" : "none"; };
+  role.onchange=sync;
+
+  const fields=[
+    el("div",{},el("label",{},"Full name"),name),
+    el("div",{},el("label",{},"Email"),email),
+  ];
+  if(!editing) fields.push(el("div",{},el("label",{},"Temporary password"),pass));
+  fields.push(el("div",{},el("label",{},"Account role"),role), capRow,
+    el("div",{},el("p",{class:"muted",style:"margin:0"}, editing
+      ? "Updates this staff member's profile. Email and password are managed in Firebase Authentication and aren't changed here."
+      : "Creates a login account. Capability sets whether this supervisor can be a student's principal, co-supervisor, or either.")));
+
+  modal(editing?"Edit staff":"Add staff login",
+    el("div",{class:"grid"},...fields),
     async()=>{
+      if(editing){
+        const profile={name:name.value.trim(),role:role.value};
+        if(role.value==="supervisor") profile.supRole=cap.value; else profile.supRole=null;
+        await DB.updateUser(existing.id,profile);
+        S.supervisors=(await DB.listUsers()).filter(u=>u.role==="supervisor");
+        toast("Staff updated."); done(); return true;
+      }
       if(!email.value.trim()||pass.value.length<6){ toast("Valid email and 6+ char password needed.",true); return false; }
       const profile={email:email.value.trim(),name:name.value.trim(),role:role.value};
       if(role.value==="supervisor") profile.supRole=cap.value;
@@ -1132,7 +1671,6 @@ function staffForm(done){
           const newUid="u"+Math.random().toString(36).slice(2,8);
           await DB.setUser(newUid,profile);
         } else {
-          // NOTE: createUser signs the new user in; we capture uid then restore admin session.
           const cred=await createUserWithEmailAndPassword(auth,email.value.trim(),pass.value);
           await DB.setUser(cred.user.uid,profile);
           toast("Staff created. You may need to sign back in.",false);
@@ -1141,7 +1679,9 @@ function staffForm(done){
         toast("Staff login created."); done(); return true;
       }catch(e){ toast(e.message||"Could not create account.",true); return false; }
     });
+  sync();
 }
+
 async function copyForward(fromSem,done){
   const label=el("input",{placeholder:"e.g. Year 2 — Semester 1"});
   const weeks=el("select",{},
@@ -1150,14 +1690,13 @@ async function copyForward(fromSem,done){
   const us=unitsOf(fromSem);
   modal("Carry students forward",
     el("div",{class:"grid"},
-      el("p",{class:"muted",style:"margin:0"},"Copies every student (with the same supervisors and unit enrolments) from “"+fromSem.label+"” into a new semester. The units below are carried over too — edit them afterwards if the codes change. Timetables, consultations and attendance start fresh."),
+      el("p",{class:"muted",style:"margin:0"},"Copies every student (with the same supervisors and unit enrolments) from \u201C"+fromSem.label+"\u201D into a new semester. The units below are carried over too. Timetables, consultations and meeting logs start fresh."),
       el("div",{},el("label",{},"New semester label"),label),
       el("div",{},el("label",{},"Teaching weeks"),weeks),
       el("div",{},el("label",{},"Units carried over"),
         el("p",{class:"muted",style:"margin:4px 0 0"},us.length?us.map(u=>u.code).filter(Boolean).join(", "):"None"))),
     async()=>{
       if(!label.value.trim()){ toast("Enter a label.",true); return false; }
-      // keep the same unit ids so student unitIds still line up
       const units=us.map(u=>({id:u.id,code:u.code,name:u.name}));
       const newId=await DB.add("semesters",{label:label.value.trim(),weeks:parseInt(weeks.value),units});
       const students=await DB.list("students",{semesterId:fromSem.id});
@@ -1170,11 +1709,13 @@ async function copyForward(fromSem,done){
 }
 
 /* ============================================================
-   12. STUDENT READ-ONLY VIEW
+   13. STUDENT READ-ONLY VIEW
+   Shows: class time(s), consultation time + meeting link, and the
+   student's own week-by-week attendance (attended / missed).
    ============================================================ */
 async function renderStudentView(sid,enrolments,sems){
   const wrap=el("div",{class:"auth-wrap",style:"align-items:flex-start;padding-top:30px"});
-  const col=el("div",{style:"width:100%;max-width:720px"});
+  const col=el("div",{style:"width:100%;max-width:760px"});
   const stu=enrolments[0];
   col.append(el("div",{class:"card",style:"border-top:4px solid var(--blue);margin-bottom:16px"},
     el("div",{class:"eyebrow ui",style:"color:var(--blue)"},"Read-only student view"),
@@ -1185,6 +1726,7 @@ async function renderStudentView(sid,enrolments,sems){
 
   for(const en of enrolments){
     const sem=sems.find(s=>s.id===en.semesterId);
+    const weeks=sem?.weeks||12;
     const myUnitIds=en.unitIds||[];
     const myUnitCodes=myUnitIds.map(id=>unitById(sem,id)?.code).filter(Boolean);
     const card=el("div",{class:"card",style:"margin-bottom:14px"});
@@ -1193,11 +1735,10 @@ async function renderStudentView(sid,enrolments,sems){
       el("h3",{style:"margin-top:2px"},sem?.label||"Semester"),
       el("p",{class:"muted",style:"margin:4px 0 12px"},"Campus: "+en.campus+
         " · Principal: "+(en.principalName||"—")+(en.coName?" · Co: "+en.coName:"")));
-    // class times: approved classes for the units this student takes
+
+    // ---- Weekly classes ----
     const tts=(await DB.list("timetables",{semesterId:en.semesterId}))
       .filter(t=>t.status==="approved"&&myUnitIds.includes(t.unitId));
-    const cons=(await DB.list("consultations",{semesterId:en.semesterId})).filter(c=>c.studentDocId===en.id&&c.status==="approved");
-
     card.append(el("div",{style:"font-weight:600;margin-bottom:4px",class:"ui"},"Weekly classes"));
     if(tts.length) tts.forEach(t=>{
       const u=unitById(sem,t.unitId);
@@ -1205,15 +1746,47 @@ async function renderStudentView(sid,enrolments,sems){
     });
     else card.append(el("p",{class:"muted",style:"margin:2px 0"},"Class times not published yet."));
 
-    card.append(el("div",{style:"font-weight:600;margin:12px 0 4px",class:"ui"},"My consultation times"));
+    // ---- Consultation (recurring) + meeting link ----
+    const cons=(await DB.list("consultations",{semesterId:en.semesterId}))
+      .filter(c=>c.studentDocId===en.id);
+    card.append(el("div",{style:"font-weight:600;margin:14px 0 4px",class:"ui"},"My consultation"));
     if(cons.length){
       cons.forEach(c=>{
-        const who=c.supervisorUid===en.principalUid?en.principalName:(c.supervisorUid===en.coUid?en.coName:"");
-        const roleWord=c.supervisorRole==="co"?"Co-supervisor":"Principal";
-        const tag=who?` · ${roleWord}: ${who}`:` · ${roleWord}`;
-        card.append(el("p",{style:"margin:2px 0"},`${c.day} ${c.start}–${c.end} · ${c.mode||""}${tag}`));
+        const block=el("div",{style:"margin:2px 0 6px"});
+        block.append(el("p",{style:"margin:2px 0"},
+          `${c.day} ${c.start}–${c.end}${c.mode?" · "+c.mode:""}`+(c.principalName?" · with "+c.principalName:"")));
+        if(c.meetingLink) block.append(el("a",{class:"linkpill",href:c.meetingLink,target:"_blank",rel:"noopener"},"Join meeting"));
+        card.append(block);
+
+        // ---- My attendance, week by week ----
+        const log=c.weeks||{};
+        const anyLogged=Object.keys(log).length>0;
+        card.append(el("div",{style:"font-weight:600;margin:12px 0 6px",class:"ui"},"My attendance"));
+        if(!anyLogged){
+          card.append(el("p",{class:"muted",style:"margin:2px 0"},"No meetings recorded yet."));
+        } else {
+          const grid=el("div",{style:"display:flex;flex-wrap:wrap;gap:6px"});
+          for(let w=1;w<=weeks;w++){
+            const l=weekLog(c,w);
+            let cls="none",txt="W"+w;
+            if(l?.held===true){
+              if(l.studentAttended===true){ cls="held"; txt="W"+w+" ✓"; }
+              else if(l.studentAttended===false){ cls="missed"; txt="W"+w+" ✗"; }
+              else { cls="none"; txt="W"+w+" ·"; }
+            } else if(l?.held===false){ cls="none"; txt="W"+w+" —"; }
+            else continue; // unrecorded weeks: skip in student view
+            const et=weekTime(c,w);
+            const pill=el("span",{class:"pill "+cls,title:`${et.day} ${et.start}–${et.end}`+(l?.comment?" · "+l.comment:"")},txt);
+            grid.append(pill);
+          }
+          if(!grid.children.length) grid.append(el("span",{class:"muted"},"No meetings recorded yet."));
+          card.append(grid);
+          // legend
+          card.append(el("p",{class:"muted ui",style:"margin:8px 0 0;font-size:13px"},
+            "✓ attended · ✗ missed · — not held · hover a week for the time and any note."));
+        }
       });
-    } else card.append(el("p",{class:"muted",style:"margin:2px 0"},"Consultation time not confirmed yet."));
+    } else card.append(el("p",{class:"muted",style:"margin:2px 0"},"Consultation time not set yet."));
 
     col.append(card);
   }
@@ -1222,7 +1795,7 @@ async function renderStudentView(sid,enrolments,sems){
 }
 
 /* ============================================================
-   13. SHARED MODAL + DELETE
+   14. SHARED MODAL + DELETE
    ============================================================ */
 function modal(title,bodyNode,onSave,saveLabel="Save"){
   const bg=el("div",{class:"modal-bg",onclick:e=>{if(e.target===bg)close();}});
@@ -1235,16 +1808,28 @@ function modal(title,bodyNode,onSave,saveLabel="Save"){
       el("button",{class:"btn ghost",onclick:close},"Cancel"), saveBtn));
   bg.append(m); document.body.append(bg);
 }
-function confirmDelete(coll,id,name,done){
+// confirmDelete: deletes a record. If cascade=true and it's a student/consultation,
+// related records are tidied up so no orphan logs remain.
+function confirmDelete(coll,id,name,done,custom){
   modal("Delete "+name+"?",
-    el("p",{class:"muted",style:"margin:0"},"This cannot be undone."),
-    async()=>{ await DB.remove(coll,id); toast("Deleted."); done(); return true; },"Delete");
-  // recolor save button to danger
+    el("p",{class:"muted",style:"margin:0"},"This cannot be undone."+
+      (coll==="students"?" Linked consultations and meeting logs for this student are also removed.":"")+
+      (coll==="semesters"?" Students, timetables and consultations in this semester remain but will be orphaned — delete with care.":"")),
+    async()=>{
+      if(custom){ await done(); return true; }
+      if(coll==="students"){
+        const cs=await DB.list("consultations",{studentDocId:id});
+        for(const c of cs) await DB.remove("consultations",c.id);
+        const ats=await DB.list("attendance",{studentDocId:id});
+        for(const a of ats) await DB.remove("attendance",a.id);
+      }
+      await DB.remove(coll,id); toast("Deleted."); done(); return true;
+    },"Delete");
   const btns=document.querySelectorAll(".modal .btn"); btns[btns.length-1].classList.add("danger");
 }
 
 /* ============================================================
-   14. BOOTSTRAP
+   15. BOOTSTRAP
    ============================================================ */
 if(DEMO){
   renderLogin();
@@ -1259,6 +1844,7 @@ if(DEMO){
 }
 window.addEventListener("error",e=>console.error(e));
 </script>
+
 </head>
 <body>
   <div class="auth-wrap"><div class="muted ui">Loading…</div></div>
