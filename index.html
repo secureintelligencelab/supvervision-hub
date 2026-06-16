@@ -257,11 +257,22 @@ try {
      (attendance collection retained for back-compat reads only; new logging
       lives inside consultations.weeks so meetings + attendance are one record.)
 
+     coslots/{id}     -> {                                   // co-supervisor's OWN diary
+                          semesterId, supervisorUid,          // the co-supervisor
+                          label, day, start, end, mode,
+                          meetingLink, note
+                        }
+       A co-supervisor's own recurring consultation/office hours, independent
+       of any one student. Use this when a co wants to offer their own slot
+       instead of (or in addition to) following the principal's per-student
+       consultation time. Visible to students they co-supervise and to the
+       principal. No admin approval.
+
    Consultation times need NO admin approval — supervisors set & change them
    week to week. Class timetables still go through admin approval for Moodle.
    ============================================================ */
 
-const mem = { users:{}, semesters:{}, students:{}, timetables:{}, consultations:{}, attendance:{}, messages:{} };
+const mem = { users:{}, semesters:{}, students:{}, timetables:{}, consultations:{}, attendance:{}, messages:{}, coslots:{} };
 let memSeed = false;
 function seedDemo(){
   if(memSeed) return; memSeed=true;
@@ -291,6 +302,11 @@ function seedDemo(){
       2:{held:true,studentAttended:false,coAttended:"na",comment:"Student unwell, rescheduled offline."},
       3:{held:true,studentAttended:true,coAttended:"no",comment:""}
     }};
+  // sample co-supervisor own diary slot (Dr Patel offers a weekly drop-in)
+  mem.coslots["cs1"]={semesterId:"s2-2026",supervisorUid:"supC",
+    label:"Drop-in office hours",day:"Thursday",start:"11:00",end:"12:00",
+    mode:"Online",meetingLink:"https://teams.microsoft.com/l/meetup/patel-dropin",
+    note:"Open to all students I co-supervise — bring methods questions."};
   // sample messages.
   // Recipient is either staff (toType 'staff', toUid) or a student (toType
   // 'student', toSid). Students are read-only and cannot send.
@@ -363,7 +379,14 @@ const DB = {
       mem.consultations[consId]={...c, weeks};
       return;
     }
-    await updateDoc(doc(db,"consultations",consId), { ["weeks."+key]: weekData });
+    const ref=doc(db,"consultations",consId);
+    try{
+      await updateDoc(ref, { ["weeks."+key]: weekData });
+    }catch(err){
+      // updateDoc fails if the doc/field is missing; setDoc+merge with a nested
+      // object writes (and creates) just this week without touching siblings.
+      await setDoc(ref, { weeks: { [key]: weekData } }, { merge:true });
+    }
   },
   // Read a single consultation fresh from the server (bypasses list caching).
   async getConsultation(id){
@@ -390,7 +413,7 @@ const el = (tag,props={},...kids)=>{
   kids.flat().forEach(c=>n.append(c?.nodeType?c:document.createTextNode(c??"")));
   return n;
 };
-function toast(msg,isErr){ const t=$("#toast"); t.textContent=msg; t.className="show"+(isErr?" err":""); setTimeout(()=>t.className="",2600); }
+function toast(msg,isErr){ let t=$("#toast"); if(!t){ t=toastNode(); document.body.append(t); } t.textContent=msg; t.className="show"+(isErr?" err":""); setTimeout(()=>t.className="",2600); }
 const CAMPUSES=["NSW","ACT","Perth","VIC","QLD"];
 const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
@@ -541,11 +564,20 @@ async function afterLogin(){
 async function studentLookup(sid){
   if(!sid){ toast("Enter your student ID.",true); return; }
   if(DEMO) seedDemo();
-  const matches=await DB.list("students",{sid});
-  if(!matches.length){ toast("No student found with that ID.",true); return; }
-  const sems=await DB.list("semesters");
-  document.body.innerHTML="";
-  renderStudentView(sid,matches,sems);
+  try{
+    const matches=await DB.list("students",{sid});
+    if(!matches.length){ toast("No student found with that ID.",true); return; }
+    const sems=await DB.list("semesters");
+    document.body.innerHTML="";
+    await renderStudentView(sid,matches,sems);
+  }catch(e){
+    console.error("student lookup failed",e);
+    // If the view was partially cleared, restore a usable screen.
+    if(!document.body.querySelector(".auth-card") && !document.body.querySelector(".card")){
+      renderLogin();
+    }
+    toast("Couldn't load your portal. Please try again.",true);
+  }
 }
 
 /* ============================================================
@@ -642,7 +674,9 @@ async function viewStudents(v){
     v.append(el("div",{class:"row",style:"margin:-4px 0 12px"},
       el("span",{class:"muted ui",style:"font-size:13px"},"Need the coordinator? "),
       emailButton(adminEmail,"MRes supervision query","Dear Admin Office,\n\n","✉ Email admin","btn sm ghost"),
-      el("button",{class:"btn sm ghost",onclick:()=>{ if(admins[0]) composeMessage(()=>toast("Sent."),"staff:"+admins[0].id); else toast("No admin on file.",true); }},"✉ Message admin")));
+      el("button",{class:"btn sm ghost",onclick:()=>{ if(admins[0]) composeMessage(()=>toast("Sent."),"staff:"+admins[0].id); else toast("No admin on file.",true); }},"✉ Message admin"),
+      el("span",{style:"flex:1"}),
+      el("button",{class:"btn sm blue",onclick:()=>broadcastMessage(()=>viewStudents(v))},"📣 Message all my students")));
   }
 
   const body=el("div",{});
@@ -957,8 +991,8 @@ async function viewConsultations(v){
   v.append(bar);
   v.append(el("p",{class:"muted ui",style:"margin-top:-6px"},
     S.role==="supervisor"
-      ? "You can set or change the recurring meeting time and link for any student you principal- OR co-supervise. Use the Supervision diary to adjust a single week or record attendance."
-      : "The principal or co-supervisor sets a recurring meeting time and a meeting link for each allocated student. No admin sign-off needed. Use the Meeting log to change a single week or to record attendance."));
+      ? "The recurring per-student meeting time and link are set by the PRINCIPAL supervisor. For students you principal-supervise you can set them here; for students you co-supervise they are read-only. As a co-supervisor, publish your own recurring time in the Co-supervisor diary below — your students otherwise follow the principal's time."
+      : "The principal supervisor sets a recurring meeting time and a meeting link for each allocated student. No admin sign-off needed. Use the Supervision diary to change a single week or to record attendance. Co-supervisors' own consultation hours are listed below."));
 
   let students=await DB.list("students", S.activeSem?{semesterId:S.activeSem}:{});
   // A supervisor sees students they supervise EITHER as principal or as co.
@@ -968,6 +1002,8 @@ async function viewConsultations(v){
   if(!students.length){
     v.append(emptyState(S.role==="supervisor"?"No students assigned to you":"No students yet",
       S.role==="supervisor"?"You'll see consultation times for students you principal- or co-supervise here.":"Add students first."));
+    // a co-capable supervisor can still publish their own diary
+    await renderCoDiary(v, sem);
     return;
   }
 
@@ -985,13 +1021,17 @@ async function viewConsultations(v){
     const isPrincipal=S.role==="supervisor" && s.principalUid===S.uid;
     const isCo  =S.role==="supervisor" && s.coUid===S.uid && !isPrincipal;
     const isAdmin=S.role==="admin";
-    // Co-supervisors may also set/edit the time directly (per coordinator policy).
-    const canEdit = isPrincipal || isCo || isAdmin;
+    // The per-student consultation time belongs to the PRINCIPAL supervisor.
+    // A co-supervisor cannot set or edit it here — they publish their own
+    // recurring time in the Co-supervisor diary ("My consultation hours").
+    const canEdit = isPrincipal || isAdmin;
 
     const actions=el("div",{class:"row"});
     if(canEdit){
       actions.append(el("button",{class:"btn ghost sm",onclick:()=>consultForm(s,c,()=>viewConsultations(v))}, c?"Edit":"Set time"));
-      if(c && (isPrincipal||isAdmin)) actions.append(el("button",{class:"btn danger sm",onclick:()=>confirmDelete("consultations",c.id,"this consultation",()=>viewConsultations(v))},"Delete"));
+      if(c) actions.append(el("button",{class:"btn danger sm",onclick:()=>confirmDelete("consultations",c.id,"this consultation",()=>viewConsultations(v))},"Delete"));
+    } else if(isCo){
+      actions.append(el("span",{class:"muted ui",style:"font-size:12.5px"},"Set by principal"));
     }
 
     const link = c?.meetingLink
@@ -1013,6 +1053,111 @@ async function viewConsultations(v){
       el("td",{},actions)));
   }
   t.append(tb); card.append(t); v.append(card);
+
+  // ---- Co-supervisor's OWN diary (independent of any one student) ----
+  // A co-supervisor can publish their own recurring consultation/office hours
+  // here. Students they co-supervise will see these in their schedule. If a co
+  // sets nothing, students simply follow the principal's per-student time.
+  await renderCoDiary(v, sem);
+}
+
+// Co-supervisor diary section. For a supervisor it's editable (their own
+// slots); for admin it's a read-only roll-up of every co-supervisor's slots.
+async function renderCoDiary(v, sem){
+  const me = S.supervisors.find(u=>u.id===S.uid);
+  const meCanCo = S.role==="supervisor" && canBeCo(me);
+  // Admin sees all; a supervisor sees only their own.
+  let slots = await DB.list("coslots", S.activeSem?{semesterId:S.activeSem}:{});
+  if(S.role==="supervisor") slots = slots.filter(x=>x.supervisorUid===S.uid);
+
+  if(S.role==="supervisor" && !meCanCo && !slots.length) return; // principal-only staff: nothing to show
+
+  const wrap=el("div",{style:"margin-top:30px"});
+  wrap.append(el("div",{class:"section-title"},el("div",{},
+    el("div",{class:"eyebrow ui"},"Co-supervisor diary"),
+    el("h2",{style:"font-size:21px"},S.role==="admin"?"Co-supervisor consultation hours":"My consultation hours"))));
+  wrap.append(el("p",{class:"muted ui",style:"margin-top:-8px"},
+    S.role==="admin"
+      ? "Recurring hours that co-supervisors offer on their own, separate from the principal's per-student times. Read-only here."
+      : "Optional. Publish your own recurring consultation/office hours as a co-supervisor — students you co-supervise will see these alongside the principal's time. If you set nothing here, your students simply follow the principal's consultation timetable."));
+
+  if(meCanCo){
+    wrap.append(el("div",{class:"row",style:"margin-bottom:12px"},
+      el("button",{class:"btn blue",onclick:()=>coSlotForm(null,()=>viewConsultations(v))},"+ Add a consultation slot")));
+  }
+
+  if(!slots.length){
+    wrap.append(emptyState(
+      S.role==="admin"?"No co-supervisor slots published":"You haven't published any consultation hours",
+      S.role==="admin"?"Co-supervisors who offer their own hours will appear here."
+        :"Add a slot above to offer your own time, or leave this empty to follow each principal's schedule."));
+    v.append(wrap); return;
+  }
+
+  const card=el("div",{class:"card",style:"padding:0;overflow:hidden"});
+  const t=el("table",{});
+  t.append(el("thead",{},el("tr",{},...[
+    ...(S.role==="admin"?["Co-supervisor"]:[]),"Slot","Day & time","Mode","Link","Note",""
+  ].map(h=>el("th",{},h)))));
+  const tb=el("tbody",{});
+  slots.sort((a,b)=>DAYS.indexOf(a.day)-DAYS.indexOf(b.day));
+  slots.forEach(sl=>{
+    const mine = sl.supervisorUid===S.uid;
+    const actions=el("div",{class:"row"});
+    if(S.role==="supervisor" && mine){
+      actions.append(
+        el("button",{class:"btn ghost sm",onclick:()=>coSlotForm(sl,()=>viewConsultations(v))},"Edit"),
+        el("button",{class:"btn danger sm",onclick:()=>confirmDelete("coslots",sl.id,"this consultation slot",()=>viewConsultations(v))},"Delete"));
+    }
+    const link = sl.meetingLink
+      ? el("a",{class:"linkpill",href:sl.meetingLink,target:"_blank",rel:"noopener"},"Open link")
+      : el("span",{class:"muted"},"—");
+    tb.append(el("tr",{},
+      ...(S.role==="admin"?[el("td",{},supName(sl.supervisorUid))]:[]),
+      el("td",{},el("strong",{},sl.label||"Consultation")),
+      el("td",{},`${sl.day} ${sl.start}–${sl.end}`),
+      el("td",{},sl.mode||"—"),
+      el("td",{},link),
+      el("td",{class:"muted",style:"max-width:240px;white-space:normal"},sl.note||"—"),
+      el("td",{},actions)));
+  });
+  t.append(tb); card.append(t); wrap.append(card);
+  v.append(wrap);
+}
+
+// Create / edit a co-supervisor's own diary slot.
+function coSlotForm(existing,done){
+  const label=el("input",{value:existing?.label||"",placeholder:"e.g. Drop-in office hours / Stats clinic"});
+  const day=el("select",{},...DAYS.map(d=>el("option",{value:d,...(d===existing?.day?{selected:"selected"}:{})},d)));
+  const start=el("input",{type:"time",value:existing?.start||"11:00"});
+  const end=el("input",{type:"time",value:existing?.end||"12:00"});
+  const mode=el("select",{},...["Online","In person","Hybrid"].map(m=>el("option",{value:m,...(m===existing?.mode?{selected:"selected"}:{})},m)));
+  const link=el("input",{value:existing?.meetingLink||"",placeholder:"https://teams.microsoft.com/… (optional)"});
+  const note=el("textarea",{placeholder:"Optional note shown to students — e.g. who it's for, what to bring."},existing?.note||"");
+  modal((existing?"Edit":"Add")+" consultation slot",
+    el("div",{class:"grid",style:"grid-template-columns:1fr 1fr"},
+      el("div",{style:"grid-column:1/-1"},el("p",{class:"muted",style:"margin:0"},
+        "This is your OWN recurring consultation time as a co-supervisor. It's separate from any principal supervisor's per-student diary and needs no admin approval. Students you co-supervise will see it in their schedule.")),
+      el("div",{style:"grid-column:1/-1"},el("label",{},"Label"),label),
+      el("div",{style:"grid-column:1/-1"},el("label",{},"Day of week"),day),
+      el("div",{},el("label",{},"Start"),start),
+      el("div",{},el("label",{},"End"),end),
+      el("div",{style:"grid-column:1/-1"},el("label",{},"Mode"),mode),
+      el("div",{style:"grid-column:1/-1"},el("label",{},"Meeting link (optional)"),link),
+      el("div",{style:"grid-column:1/-1"},el("label",{},"Note (optional)"),note)
+    ),
+    async()=>{
+      if(start.value>=end.value){ toast("End must be after start.",true); return false; }
+      const data={
+        semesterId:S.activeSem, supervisorUid:S.uid,
+        label:label.value.trim()||"Consultation",
+        day:day.value, start:start.value, end:end.value, mode:mode.value,
+        meetingLink:link.value.trim(), note:note.value.trim()
+      };
+      if(existing){ await DB.update("coslots",existing.id,data); }
+      else { await DB.add("coslots",data); }
+      toast("Consultation slot saved."); done(); return true;
+    });
 }
 
 function consultForm(student,existing,done){
@@ -1105,8 +1250,9 @@ async function viewMeetingLog(v){
       statBox(stats.held?Math.round(stats.attended/stats.held*100)+"%":"—","Attendance rate"));
     panel.append(strip);
 
-    // who can arrange/change the meeting TIME & LINK (principal, co, or admin)
-    const canSetTime = (S.role==="supervisor" && (s.principalUid===S.uid||s.coUid===S.uid)) || S.role==="admin";
+    // who can arrange/change the per-student meeting TIME & LINK
+    // (principal or admin only — a co-supervisor uses their own diary instead)
+    const canSetTime = (S.role==="supervisor" && s.principalUid===S.uid) || S.role==="admin";
     // who records ATTENDANCE each week (principal only; admin & co are read-only)
     const canEdit = (S.role==="supervisor" && s.principalUid===S.uid);
 
@@ -1145,7 +1291,7 @@ async function viewMeetingLog(v){
     }
     if(!canEdit && S.role==="supervisor" && s.coUid===S.uid){
       panel.append(el("p",{class:"muted ui",style:"margin-top:10px"},
-        "You co-supervise "+s.name+". You can arrange or change the meeting time and link above. Weekly attendance is recorded by the principal supervisor"+(s.principalName?" ("+s.principalName+")":"")+" and is shown to you read-only."));
+        "You co-supervise "+s.name+". The recurring meeting time, link and weekly attendance are set by the principal supervisor"+(s.principalName?" ("+s.principalName+")":"")+" and are shown to you read-only. To offer your own time, use “My consultation hours” on the Consultations tab."));
     }
   }
 
@@ -1196,6 +1342,35 @@ async function viewMeetingLog(v){
         }));
     }
     body.append(controls);
+
+    // Reset — clears this week's record (held / attendance / comment) so the
+    // supervisor can fix a mistake. Only shown when there's something to clear.
+    if(canEdit && Object.keys(l).length){
+      const hasOverride=!!(l.day||l.start||l.end||l.mode||l.link);
+      const resetRow=el("div",{class:"row",style:"margin-top:8px"});
+      resetRow.append(el("button",{class:"btn ghost xs",onclick:()=>{
+        modal("Reset week "+w+"?",
+          el("p",{class:"muted",style:"margin:0"},
+            "This clears the meeting record for week "+w+" (held status, attendance and comment), so you can record it again."+
+            (hasOverride?" The changed time for this week will also be reset to the recurring time.":"")),
+          async()=>{
+            try{
+              // Clearing = overwrite the week with an empty record.
+              await DB.updateWeek(c.id, String(w), {});
+              if(!c.weeks) c.weeks={};
+              c.weeks[String(w)]={};
+            }catch(err){
+              console.error("week reset failed",err);
+              toast("Couldn't reset — "+(err?.code||err?.message||"please try again."),true);
+              return false;
+            }
+            toast("Week "+w+" reset."); renderStudentAfterReload(studentId); return true;
+          },"Reset week");
+        // tint the confirm button
+        const b=document.querySelectorAll(".modal .btn"); b[b.length-1].classList.add("danger");
+      }},"↺ Reset week "+w));
+      body.append(resetRow);
+    }
 
     // comment — saves automatically (debounced while typing, and on blur)
     if(canEdit){
@@ -1250,7 +1425,13 @@ async function viewMeetingLog(v){
     const merged={...prev,...partial};
     // strip undefined so Firestore doesn't choke
     Object.keys(merged).forEach(k=>merged[k]===undefined&&delete merged[k]);
-    await DB.updateWeek(c.id, key, merged);
+    try{
+      await DB.updateWeek(c.id, key, merged);
+    }catch(err){
+      console.error("patchWeek failed",err);
+      toast("Couldn't save — "+(err?.code||err?.message||"please try again."),true);
+      throw err; // let callers (e.g. the comment saver) know it didn't persist
+    }
     if(!c.weeks) c.weeks={};
     c.weeks[key]=merged; // keep local copy fresh
   }
@@ -1311,7 +1492,13 @@ function weekOverrideForm(c,w,done){
       }
       // clean undefined keys
       Object.keys(weekData).forEach(k=>weekData[k]===undefined&&delete weekData[k]);
-      await DB.updateWeek(c.id, key, weekData);
+      try{
+        await DB.updateWeek(c.id, key, weekData);
+      }catch(err){
+        console.error("week override save failed",err);
+        toast("Couldn't save this week's time — "+(err?.code||err?.message||"please try again."),true);
+        return false; // keep the modal open so the entry isn't lost
+      }
       if(!c.weeks) c.weeks={};
       c.weeks[key]=weekData; // local copy fresh so re-render shows the new time
       toast("Week "+w+" updated."); done(); return true;
@@ -1338,7 +1525,7 @@ async function viewMessages(v){
     el("div",{class:"eyebrow ui"},"Direct messages"),
     el("h2",{},"Messages"))));
   v.append(el("p",{class:"muted ui",style:"margin-top:-8px"},
-    "Send a direct message to any staff member or student. Students can read messages sent to them but cannot reply."));
+    "Send a direct message to any staff member or student, or a shared note to all your students. In-app only: messages appear inside the app — they are not sent to anyone's email or mobile. Students can read messages addressed to them but cannot reply."));
 
   // sub-tabs: Inbox / Sent
   let sub = viewMessages._sub || "inbox";
@@ -1347,7 +1534,9 @@ async function viewMessages(v){
   subBar.append(mkSub("inbox","Inbox"),mkSub("sent","Sent"));
   v.append(el("div",{class:"row",style:"justify-content:space-between;align-items:center"},
     subBar,
-    el("button",{class:"btn",onclick:()=>composeMessage(()=>viewMessages(v))},"✎ New message")));
+    el("div",{class:"row"},
+      el("button",{class:"btn blue",onclick:()=>broadcastMessage(()=>viewMessages(v))},"📣 Message all my students"),
+      el("button",{class:"btn",onclick:()=>composeMessage(()=>viewMessages(v))},"✎ New message"))));
 
   const all=await DB.list("messages");
   let rows;
@@ -1379,7 +1568,7 @@ async function viewMessages(v){
   rows.forEach(m=>{
     const who = sub==="inbox"
       ? "From "+(m.fromName||"—")
-      : "To "+(m.toName||"—")+(m.toType==="student"?" (student)":"");
+      : "To "+(m.toName||"—")+(m.toType==="student"?" (student)":"")+(m.broadcast?" · broadcast":"");
     const unread = sub==="inbox" && false; // already marked read above
     const card=el("div",{class:"card",style:"padding:14px 16px"});
     card.append(
@@ -1433,7 +1622,7 @@ async function composeMessage(done, preselect){
     el("div",{class:"grid"},
       el("div",{},el("label",{},"To"),sel),
       el("div",{},el("label",{},"Message"),body),
-      el("p",{class:"muted",style:"margin:0"},"The recipient will see this in their Messages. Students see it in their schedule view but can't reply.")),
+      el("p",{class:"muted",style:"margin:0"},"In-app only: the recipient sees this inside the app (students in their schedule view) — it is not sent to their email or mobile. Students can't reply.")),
     async()=>{
       if(!sel.value){ toast("Choose a recipient.",true); return false; }
       if(!body.value.trim()){ toast("Write a message first.",true); return false; }
@@ -1450,6 +1639,52 @@ async function composeMessage(done, preselect){
       await DB.add("messages",data);
       toast("Message sent."); done(); return true;
     },"Send");
+}
+
+// Broadcast: send the SAME message to every student a supervisor supervises
+// (as principal or co), or — for admin — to every student in the active
+// semester. One student-addressed message row is created per recipient, so it
+// lands in each student's read-only view. Nothing is emailed or texted.
+async function broadcastMessage(done){
+  const allStudents=await DB.list("students", S.activeSem?{semesterId:S.activeSem}:{});
+  let recipients=allStudents;
+  if(S.role==="supervisor"){
+    recipients=allStudents.filter(s=>s.principalUid===S.uid||s.coUid===S.uid);
+  }
+  // de-dupe by student ID (sid) so a student enrolled twice gets one copy
+  const seen=new Set(); recipients=recipients.filter(s=>{ if(seen.has(s.sid))return false; seen.add(s.sid); return true; });
+
+  if(!recipients.length){
+    toast(S.role==="supervisor"?"You have no students in this semester.":"No students in this semester.",true);
+    return;
+  }
+
+  const body=el("textarea",{placeholder:"Shared message to all your students — e.g. a reading, a deadline reminder, a room change…",style:"min-height:130px"});
+  const scopeNote = S.role==="supervisor"
+    ? `This goes to all ${recipients.length} student${recipients.length===1?"":"s"} you supervise (principal or co) this semester.`
+    : `This goes to all ${recipients.length} student${recipients.length===1?"":"s"} in this semester.`;
+
+  modal("Message all my students",
+    el("div",{class:"grid"},
+      el("div",{},el("label",{},"Recipients"),
+        el("p",{class:"muted",style:"margin:2px 0 0"},scopeNote)),
+      el("div",{},el("label",{},"Message"),body),
+      el("p",{class:"muted",style:"margin:0"},
+        "In-app only: students see this in their schedule view when they next open the app. It is NOT sent to their email or mobile, and students cannot reply.")),
+    async()=>{
+      const text=body.value.trim();
+      if(!text){ toast("Write a message first.",true); return false; }
+      const fromName=S.userName||S.user.email;
+      // Write each recipient as a separate student-addressed message.
+      for(const s of recipients){
+        await DB.add("messages",{
+          fromUid:S.uid, fromName, fromRole:S.role,
+          toType:"student", toSid:s.sid, toName:s.name||"",
+          body:text, ts:Date.now(), readBy:{}, broadcast:true
+        });
+      }
+      toast(`Sent to ${recipients.length} student${recipients.length===1?"":"s"}.`); done(); return true;
+    },"Send to all");
 }
 
 /* ============================================================
@@ -2104,8 +2339,14 @@ async function renderStudentView(sid,enrolments,sems){
         " · Principal: "+(en.principalName||"—")+(en.coName?" · Co: "+en.coName:"")));
 
     // ---- Weekly classes ----
+    // Only the classes RUN BY THIS STUDENT'S PRINCIPAL SUPERVISOR, for units the
+    // student is enrolled in, and only once admin-approved. A unit may be taught
+    // by several supervisors (e.g. one class group per campus); the student must
+    // see only their own principal's group, not every campus's.
     const tts=(await DB.list("timetables",{semesterId:en.semesterId}))
-      .filter(t=>t.status==="approved"&&myUnitIds.includes(t.unitId));
+      .filter(t=>t.status==="approved"
+                 && myUnitIds.includes(t.unitId)
+                 && t.supervisorUid===en.principalUid);
     card.append(el("div",{style:"font-weight:600;margin-bottom:4px",class:"ui"},"Weekly classes"));
     if(tts.length) tts.forEach(t=>{
       const u=unitById(sem,t.unitId);
@@ -2121,9 +2362,32 @@ async function renderStudentView(sid,enrolments,sems){
       cons.forEach(c=>{
         const block=el("div",{style:"margin:2px 0 6px"});
         block.append(el("p",{style:"margin:2px 0"},
+          el("span",{class:"muted ui",style:"font-size:12px"},"Usual time: "),
           `${c.day} ${c.start}–${c.end}${c.mode?" · "+c.mode:""}`+(c.principalName?" · with "+c.principalName:"")));
         if(c.meetingLink) block.append(el("a",{class:"linkpill",href:c.meetingLink,target:"_blank",rel:"noopener"},"Join meeting"));
         card.append(block);
+
+        // ---- Weeks with a CHANGED time (overrides) ----
+        // The supervisor can change one week's time/link. Surface every such
+        // week so the student sees it, not just the recurring time. We show all
+        // overridden weeks (held or not), since a changed upcoming meeting is
+        // exactly what a student needs to know.
+        const changed=[];
+        for(let w=1;w<=weeks;w++){
+          const et=weekTime(c,w);
+          if(et.overridden) changed.push({w,et});
+        }
+        if(changed.length){
+          card.append(el("div",{style:"font-weight:600;margin:10px 0 4px",class:"ui"},"Changed meeting times"));
+          changed.forEach(({w,et})=>{
+            const row=el("div",{style:"margin:2px 0 6px"});
+            row.append(el("p",{style:"margin:2px 0"},
+              el("span",{class:"pill blue",style:"font-size:11.5px;margin-right:6px"},"Week "+w),
+              `${et.day} ${et.start}–${et.end}${et.mode?" · "+et.mode:""}`));
+            if(et.link) row.append(el("a",{class:"linkpill",href:et.link,target:"_blank",rel:"noopener"},"Join meeting"));
+            card.append(row);
+          });
+        }
 
         // ---- My attendance, week by week ----
         const log=c.weeks||{};
@@ -2143,24 +2407,47 @@ async function renderStudentView(sid,enrolments,sems){
             } else if(l?.held===false){ cls="none"; txt="W"+w+" —"; }
             else continue; // unrecorded weeks: skip in student view
             const et=weekTime(c,w);
-            const pill=el("span",{class:"pill "+cls,title:`${et.day} ${et.start}–${et.end}`+(l?.comment?" · "+l.comment:"")},txt);
+            if(et.overridden) txt+=" *"; // time was changed this week
+            const pill=el("span",{class:"pill "+cls,title:`${et.day} ${et.start}–${et.end}`+(et.overridden?" (changed time)":"")+(l?.comment?" · "+l.comment:"")},txt);
             grid.append(pill);
           }
           if(!grid.children.length) grid.append(el("span",{class:"muted"},"No meetings recorded yet."));
           card.append(grid);
           // legend
           card.append(el("p",{class:"muted ui",style:"margin:8px 0 0;font-size:13px"},
-            "✓ attended · ✗ missed · — not held · hover a week for the time and any note."));
+            "✓ attended · ✗ missed · — not held · * time changed that week · hover a week for the time and any note."));
         }
       });
     } else card.append(el("p",{class:"muted",style:"margin:2px 0"},"Consultation time not set yet."));
+
+    // ---- Co-supervisor's own consultation hours (if their co-supervisor offers any) ----
+    if(en.coUid){
+      const coSlots=(await DB.list("coslots",{semesterId:en.semesterId}))
+        .filter(x=>x.supervisorUid===en.coUid);
+      if(coSlots.length){
+        card.append(el("div",{style:"font-weight:600;margin:14px 0 4px",class:"ui"},
+          "Co-supervisor consultation hours"+(en.coName?" · "+en.coName:"")));
+        coSlots.sort((a,b)=>DAYS.indexOf(a.day)-DAYS.indexOf(b.day)).forEach(sl=>{
+          const block=el("div",{style:"margin:2px 0 6px"});
+          block.append(el("p",{style:"margin:2px 0"},
+            (sl.label?sl.label+": ":"")+`${sl.day} ${sl.start}–${sl.end}`+(sl.mode?" · "+sl.mode:"")));
+          if(sl.note) block.append(el("p",{class:"muted",style:"margin:0 0 2px"},sl.note));
+          if(sl.meetingLink) block.append(el("a",{class:"linkpill",href:sl.meetingLink,target:"_blank",rel:"noopener"},"Join"));
+          card.append(block);
+        });
+      }
+    }
 
     col.append(card);
   }
 
   // ---- Messages to this student (read-only) ----
-  const msgs=(await DB.list("messages"))
-    .filter(m=>m.toType==="student" && m.toSid===sid)
+  // Filter the query to this student's own messages. An unfiltered read of the
+  // whole `messages` collection is rejected by security rules for an
+  // unauthenticated student (staff-to-staff rows aren't publicly readable),
+  // which would abort the whole view. Querying by toType+toSid means every
+  // returned row satisfies the public student-message read rule.
+  const msgs=(await DB.list("messages",{toType:"student",toSid:sid}))
     .sort((a,b)=>(b.ts||0)-(a.ts||0));
   const msgCard=el("div",{class:"card",style:"margin-bottom:14px;border-top:4px solid var(--teal)"});
   msgCard.append(
