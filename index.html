@@ -676,6 +676,7 @@ async function viewStudents(v){
       emailButton(adminEmail,"MRes supervision query","Dear Admin Office,\n\n","✉ Email admin","btn sm ghost"),
       el("button",{class:"btn sm ghost",onclick:()=>{ if(admins[0]) composeMessage(()=>toast("Sent."),"staff:"+admins[0].id); else toast("No admin on file.",true); }},"✉ Message admin"),
       el("span",{style:"flex:1"}),
+      el("button",{class:"btn sm ghost",onclick:()=>bulkEmailStudents()},"📧 Email all my students"),
       el("button",{class:"btn sm blue",onclick:()=>broadcastMessage(()=>viewStudents(v))},"📣 Message all my students")));
   }
 
@@ -1685,6 +1686,84 @@ async function broadcastMessage(done){
       }
       toast(`Sent to ${recipients.length} student${recipients.length===1?"":"s"}.`); done(); return true;
     },"Send to all");
+}
+
+/* ============================================================
+   9b. BULK EMAIL TO STUDENTS (supervisor)
+   Opens the supervisor's own mail app (via mailto:) with their
+   students' addresses pre-loaded into BCC, plus a subject/body the
+   supervisor can edit. Scope can be narrowed to just the students
+   they are principal supervisor for, just the ones they co-supervise,
+   or everyone. BCC keeps each student's address private from the
+   others. Nothing is sent from the app itself — the supervisor taps
+   "send" in their mail client.
+   ============================================================ */
+async function bulkEmailStudents(){
+  if(S.role!=="supervisor"){ toast("Bulk email is for supervisors.",true); return; }
+  const all=await DB.list("students", S.activeSem?{semesterId:S.activeSem}:{});
+  const mine=all.filter(s=>s.principalUid===S.uid||s.coUid===S.uid);
+  if(!mine.length){ toast("You have no students in this semester.",true); return; }
+
+  const principalCount=mine.filter(s=>s.principalUid===S.uid).length;
+  const coCount=mine.filter(s=>s.coUid===S.uid && s.principalUid!==S.uid).length;
+
+  // scope picker
+  const scope=el("select",{},
+    el("option",{value:"all"},`All my students (${mine.length})`),
+    el("option",{value:"principal"},`Students I am principal supervisor for (${principalCount})`),
+    el("option",{value:"co"},`Students I co-supervise (${coCount})`));
+  const subject=el("input",{value:"MRes supervision — "+(activeSemester()?.label||"this semester")});
+  const body=el("textarea",{placeholder:"Dear all,\n\nA quick note for everyone I supervise this semester…",style:"min-height:120px"});
+  const note=el("p",{class:"muted",style:"margin:0"});
+  const preview=el("p",{class:"muted",style:"margin:2px 0 0;font-size:13px"});
+
+  function selected(){
+    const m=scope.value;
+    let list = m==="principal" ? mine.filter(s=>s.principalUid===S.uid)
+             : m==="co"        ? mine.filter(s=>s.coUid===S.uid && s.principalUid!==S.uid)
+             :                   mine;
+    // unique by sid, only those with an email on file
+    const seen=new Set();
+    return list.filter(s=>{ if(!s.email) return false; if(seen.has(s.sid)) return false; seen.add(s.sid); return true; });
+  }
+  function refresh(){
+    const recips=selected();
+    const noEmail=( scope.value==="principal" ? mine.filter(s=>s.principalUid===S.uid)
+                  : scope.value==="co"        ? mine.filter(s=>s.coUid===S.uid && s.principalUid!==S.uid)
+                  :                             mine ).filter(s=>!s.email).length;
+    note.textContent = recips.length
+      ? `${recips.length} recipient${recips.length===1?"":"s"} will be added to BCC (each address hidden from the others).`
+      : "No students with an email on file in this group.";
+    preview.textContent = recips.length
+      ? "To: "+recips.map(s=>s.name||s.email).slice(0,6).join(", ")+(recips.length>6?` +${recips.length-6} more`:"")
+        + (noEmail?`  ·  ${noEmail} skipped (no email).`:"")
+      : "";
+  }
+  scope.onchange=refresh; refresh();
+
+  modal("Email all my students",
+    el("div",{class:"grid"},
+      el("div",{},el("label",{},"Who to email"),scope),
+      el("div",{},el("label",{},"Subject"),subject),
+      el("div",{},el("label",{},"Message"),body),
+      note, preview,
+      el("p",{class:"muted",style:"margin:0"},
+        "This opens your device's mail app with the addresses in BCC and the text pre-filled. Review and tap send there — the hub does not send email itself.")),
+    async()=>{
+      const recips=selected();
+      if(!recips.length){ toast("No students with an email to send to.",true); return false; }
+      const emails=recips.map(s=>s.email);
+      // mailto with BCC; put the supervisor's own address (if known) as the visible "to"
+      const me=S.supervisors.find(u=>u.id===S.uid);
+      const to=me?.email||"";
+      const url="mailto:"+encodeURIComponent(to)
+        +"?bcc="+encodeURIComponent(emails.join(","))
+        +"&subject="+encodeURIComponent(subject.value||"")
+        +"&body="+encodeURIComponent(body.value||"");
+      window.location.href=url;
+      toast(`Opening mail app with ${recips.length} recipient${recips.length===1?"":"s"} in BCC.`);
+      return true;
+    },"Open mail app");
 }
 
 /* ============================================================
